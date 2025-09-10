@@ -34,8 +34,7 @@ export const useAIPlayers = () => {
       return newThinking;
     });
 
-    // Simulate thinking time
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+    // AI plays instantly
 
     const aiHand = gameState.playerHands[aiPlayerIndex];
     const currentTop = gameState.currentSequence;
