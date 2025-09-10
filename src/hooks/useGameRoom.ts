@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 interface GameRoom {
   id: string;
   room_code: string;
-  host_id: string;
+  host_session_id: string;
   max_players: number;
   current_players: number;
   status: string;
@@ -15,11 +15,21 @@ interface GameRoom {
 interface GamePlayer {
   id: string;
   room_id: string;
-  user_id: string;
+  session_id: string;
   player_index: number;
   display_name: string;
   is_host: boolean;
 }
+
+// Generate a unique session ID for this browser session
+const getSessionId = (): string => {
+  let sessionId = localStorage.getItem('game_session_id');
+  if (!sessionId) {
+    sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    localStorage.setItem('game_session_id', sessionId);
+  }
+  return sessionId;
+};
 
 export const useGameRoom = () => {
   const [currentRoom, setCurrentRoom] = useState<GameRoom | null>(null);
@@ -31,18 +41,7 @@ export const useGameRoom = () => {
     try {
       setIsLoading(true);
       
-      // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to create a room",
-          variant: "destructive"
-        });
-        return null;
-      }
-
-      // Generate room code
+      const sessionId = getSessionId();
       const roomCode = generateRoomCode();
       
       // Create room
@@ -50,7 +49,7 @@ export const useGameRoom = () => {
         .from('game_rooms')
         .insert({
           room_code: roomCode,
-          host_id: user.id,
+          host_session_id: sessionId,
           max_players: 5,
           status: 'waiting'
         })
@@ -64,7 +63,7 @@ export const useGameRoom = () => {
         .from('game_players')
         .insert({
           room_id: room.id,
-          user_id: user.id,
+          session_id: sessionId,
           player_index: 0,
           display_name: displayName,
           is_host: true
@@ -91,15 +90,7 @@ export const useGameRoom = () => {
     try {
       setIsLoading(true);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to join a room",
-          variant: "destructive"
-        });
-        return false;
-      }
+      const sessionId = getSessionId();
 
       // Find room by code
       const { data: room, error: roomError } = await supabase
@@ -127,12 +118,12 @@ export const useGameRoom = () => {
         return false;
       }
 
-      // Check if user already in room
+      // Check if session already in room
       const { data: existingPlayer } = await supabase
         .from('game_players')
         .select('*')
         .eq('room_id', room.id)
-        .eq('user_id', user.id)
+        .eq('session_id', sessionId)
         .single();
 
       if (existingPlayer) {
@@ -145,7 +136,7 @@ export const useGameRoom = () => {
         .from('game_players')
         .insert({
           room_id: room.id,
-          user_id: user.id,
+          session_id: sessionId,
           player_index: room.current_players,
           display_name: displayName,
           is_host: false
@@ -174,14 +165,14 @@ export const useGameRoom = () => {
 
   const leaveRoom = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !currentRoom) return;
+      const sessionId = getSessionId();
+      if (!currentRoom) return;
 
       await supabase
         .from('game_players')
         .delete()
         .eq('room_id', currentRoom.id)
-        .eq('user_id', user.id);
+        .eq('session_id', sessionId);
 
       setCurrentRoom(null);
       setPlayers([]);

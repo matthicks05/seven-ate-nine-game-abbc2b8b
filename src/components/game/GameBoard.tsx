@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useGameRoom } from "@/hooks/useGameRoom";
-import { AuthCheck } from "@/components/auth/AuthCheck";
+
 
 // 7-ate-9 deck creation
 const createNumberCard = (id: string, value: number): Card => ({
@@ -632,9 +632,5 @@ const GameBoardContent = () => {
  };
 
 export const GameBoard = () => {
-  return (
-    <AuthCheck>
-      <GameBoardContent />
-    </AuthCheck>
-  );
+  return <GameBoardContent />;
 };
