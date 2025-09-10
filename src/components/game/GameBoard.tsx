@@ -530,7 +530,7 @@ const GameBoardContent = () => {
               Select number of {gameState.gamePhase === "aiSetup" ? "AI opponents" : "players"}:
             </p>
             <div className="flex gap-3 justify-center">
-              {(gameState.gamePhase === "aiSetup" ? [2, 3, 4, 5] : [3, 4, 5]).map(count => (
+              {(gameState.gamePhase === "aiSetup" ? [3, 4, 5] : [3, 4, 5]).map(count => (
                 <Button
                   key={count}
                   onClick={() => startNewGame(count)}
