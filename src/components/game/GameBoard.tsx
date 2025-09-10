@@ -289,10 +289,15 @@ const GameBoardContent = () => {
       const isAITurn = currentPlayer > 0; // Player 0 is human, others are AI
       
       if (isAITurn && !aiThinking[currentPlayer]) {
-        makeAIMove(gameState, currentPlayer, handleCardPlay, handleDrawCard);
+        // Add a small delay to make AI moves feel more natural
+        const timer = setTimeout(() => {
+          makeAIMove(gameState, currentPlayer, handleCardPlay, handleDrawCard);
+        }, 500);
+        
+        return () => clearTimeout(timer);
       }
     }
-  }, [gameState, aiThinking, makeAIMove]);
+  }, [gameState.currentPlayer, gameState.gamePhase, gameState.gameMode, gameState.winner, aiThinking, makeAIMove]);
 
   if (gameState.gamePhase === "modeSelect") {
     return (
