@@ -60,14 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    // Create profile if sign up successful
-    if (!error) {
-      // Insert user score record
-      await supabase.from('user_scores').insert([
-        { user_id: (await supabase.auth.getUser()).data.user?.id }
-      ]);
-    }
-
     return { error };
   };
 

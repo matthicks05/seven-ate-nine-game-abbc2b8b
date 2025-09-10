@@ -1,21 +1,19 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/components/auth/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 export const useGameScoring = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
 
-  const awardPointsForWin = useCallback(async (gameMode: string) => {
-    if (!user || gameMode === 'local') {
+  const awardPointsForWin = useCallback(async (gameMode: string, userId?: string) => {
+    if (!userId || gameMode === 'local') {
       return; // No points for local games or non-authenticated users
     }
 
     try {
       // Call the award_points function
       const { error } = await supabase.rpc('award_points', {
-        p_user_id: user.id,
+        p_user_id: userId,
         p_points: 1
       });
 
@@ -31,17 +29,17 @@ export const useGameScoring = () => {
     } catch (error) {
       console.error('Error in awardPointsForWin:', error);
     }
-  }, [user, toast]);
+  }, [toast]);
 
-  const recordGamePlayed = useCallback(async (gameMode: string) => {
-    if (!user || gameMode === 'local') {
+  const recordGamePlayed = useCallback(async (gameMode: string, userId?: string) => {
+    if (!userId || gameMode === 'local') {
       return; // No recording for local games or non-authenticated users
     }
 
     try {
       // Call the record_game_played function
       const { error } = await supabase.rpc('record_game_played', {
-        p_user_id: user.id
+        p_user_id: userId
       });
 
       if (error) {
@@ -50,11 +48,10 @@ export const useGameScoring = () => {
     } catch (error) {
       console.error('Error in recordGamePlayed:', error);
     }
-  }, [user]);
+  }, []);
 
   return {
     awardPointsForWin,
-    recordGamePlayed,
-    isAuthenticated: !!user
+    recordGamePlayed
   };
 };

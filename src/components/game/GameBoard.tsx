@@ -106,7 +106,19 @@ const GameBoardContent = () => {
   const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom, sessionId } = useGameRoom();
   const { makeAIMove, initializeAI, aiThinking } = useAIPlayers();
   const { awardPointsForWin, recordGamePlayed } = useGameScoring();
-  const { user, signOut } = useAuth();
+  
+  // Safely get auth context
+  let user = null;
+  let signOut = () => {};
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+    signOut = authContext.signOut;
+  } catch (error) {
+    // Auth context not available, continue without auth features
+    console.log('Auth context not available');
+  }
+  
   const navigate = useNavigate();
 
   const startNewGame = (playerCount: number = 4) => {
@@ -235,10 +247,10 @@ const GameBoardContent = () => {
         if ((gameState.gameMode === 'online' || gameState.gameMode === 'ai') && user) {
           if (winner === 0 || (gameState.gameMode === 'ai' && winner === 0)) {
             // Human player won
-            setTimeout(() => awardPointsForWin(gameState.gameMode), 1000);
+            setTimeout(() => awardPointsForWin(gameState.gameMode, user.id), 1000);
           } else {
             // Record the game as played (loss)
-            setTimeout(() => recordGamePlayed(gameState.gameMode), 1000);
+            setTimeout(() => recordGamePlayed(gameState.gameMode, user.id), 1000);
           }
         }
       }
