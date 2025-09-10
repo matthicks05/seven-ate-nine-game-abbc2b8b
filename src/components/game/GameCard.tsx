@@ -2,8 +2,9 @@ import { cn } from "@/lib/utils";
 
 export interface Card {
   id: string;
-  value: number | "skip";
-  color?: "blue" | "red" | "green" | "yellow";
+  type: "number" | "wild";
+  value?: number; // 1-9 for numbered cards
+  wildType?: "ate" | "addy" | "divide" | "british3" | "slicepi" | "nuuh" | "cannibal" | "negativity" | "tickles";
   isVisible?: boolean;
 }
 
@@ -31,14 +32,32 @@ export const GameCard = ({
   };
 
   const getCardColor = () => {
-    if (card.value === "skip") return "bg-gradient-accent";
-    switch (card.color) {
-      case "blue": return "bg-gradient-primary";
-      case "red": return "bg-destructive";
-      case "green": return "bg-green-500";
-      case "yellow": return "bg-yellow-500";
-      default: return "bg-gradient-secondary";
+    if (card.type === "wild") return "bg-gradient-accent";
+    // Color coding for numbered cards by value ranges
+    if (card.value! <= 3) return "bg-gradient-primary";
+    if (card.value! <= 6) return "bg-destructive";
+    return "bg-gradient-secondary";
+  };
+
+  const getCardDisplay = () => {
+    if (card.type === "number") {
+      return card.value;
     }
+    
+    // Wild card display names
+    const wildDisplays = {
+      ate: "ATE",
+      addy: "ADD",
+      divide: "÷",
+      british3: "3🇬🇧",
+      slicepi: "π",
+      nuuh: "NU-UH",
+      cannibal: "🍽️",
+      negativity: "-1",
+      tickles: "2👋"
+    };
+    
+    return wildDisplays[card.wildType!] || "?";
   };
 
   return (
@@ -58,18 +77,18 @@ export const GameCard = ({
         <div className="flex flex-col items-center justify-center h-full p-1">
           {/* Card Value */}
           <div className={cn(
-            "flex items-center justify-center text-white font-bold rounded-full w-8 h-8 text-sm",
+            "flex items-center justify-center text-white font-bold rounded-full min-w-8 h-8 px-1 text-xs",
             getCardColor()
           )}>
-            {card.value === "skip" ? "S" : card.value}
+            {getCardDisplay()}
           </div>
           
           {/* Corner Values */}
           <div className="absolute top-1 left-1 text-xs font-bold text-card-foreground">
-            {card.value === "skip" ? "S" : card.value}
+            {getCardDisplay()}
           </div>
           <div className="absolute bottom-1 right-1 text-xs font-bold text-card-foreground transform rotate-180">
-            {card.value === "skip" ? "S" : card.value}
+            {getCardDisplay()}
           </div>
         </div>
       ) : (
