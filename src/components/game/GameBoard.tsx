@@ -4,7 +4,10 @@ import { GameCard, Card } from "./GameCard";
 import { GameRulesModal } from "./GameRulesModal";
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useGameRoom } from "@/hooks/useGameRoom";
+import { AuthCheck } from "@/components/auth/AuthCheck";
 
 // 7-ate-9 deck creation
 const createNumberCard = (id: string, value: number): Card => ({
@@ -75,7 +78,7 @@ interface GameState {
   winner: number | null;
 }
 
-export const GameBoard = () => {
+const GameBoardContent = () => {
   const [gameState, setGameState] = useState<GameState>({
     deck: [],
     discardPile: [],
@@ -88,6 +91,10 @@ export const GameBoard = () => {
     roomCode: null,
     winner: null
   });
+
+  const [joinRoomCode, setJoinRoomCode] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom } = useGameRoom();
 
   const startNewGame = (playerCount: number = 4) => {
     const fullDeck = createFullDeck();
@@ -133,12 +140,36 @@ export const GameBoard = () => {
         gamePhase: "setup"
       }));
     } else {
-      // Online mode - create room
-      const roomCode = generateRoomCode();
+      // Online mode - go to join/create selection
       setGameState(prev => ({
         ...prev,
         gameMode: mode,
+        gamePhase: "lobby"
+      }));
+    }
+  };
+
+  const handleCreateRoom = async () => {
+    if (!displayName.trim()) return;
+    
+    const roomCode = await createRoom(displayName.trim());
+    if (roomCode) {
+      setGameState(prev => ({
+        ...prev,
         roomCode,
+        gamePhase: "lobby"
+      }));
+    }
+  };
+
+  const handleJoinRoom = async () => {
+    if (!displayName.trim() || !joinRoomCode.trim()) return;
+    
+    const success = await joinRoom(joinRoomCode.trim().toUpperCase(), displayName.trim());
+    if (success) {
+      setGameState(prev => ({
+        ...prev,
+        roomCode: joinRoomCode.trim().toUpperCase(),
         gamePhase: "lobby"
       }));
     }
@@ -255,6 +286,70 @@ export const GameBoard = () => {
   }
 
   if (gameState.gamePhase === "lobby") {
+    // Show room creation/joining interface if no room selected
+    if (!currentRoom) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="text-center space-y-8 max-w-md">
+            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Online Game
+            </h1>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Your Name</label>
+                <Input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Enter your display name"
+                  className="w-full"
+                />
+              </div>
+
+              <div className="grid gap-4">
+                <Button
+                  onClick={handleCreateRoom}
+                  disabled={!displayName.trim() || isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "Creating..." : "Create New Room"}
+                </Button>
+                
+                <div className="text-center text-sm text-muted-foreground">or</div>
+                
+                <div className="space-y-2">
+                  <Input
+                    value={joinRoomCode}
+                    onChange={(e) => setJoinRoomCode(e.target.value.toUpperCase())}
+                    placeholder="Enter room code"
+                    maxLength={4}
+                    className="w-full text-center text-lg tracking-wider"
+                  />
+                  <Button
+                    onClick={handleJoinRoom}
+                    disabled={!displayName.trim() || !joinRoomCode.trim() || isLoading}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {isLoading ? "Joining..." : "Join Room"}
+                  </Button>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))}
+                variant="ghost"
+                className="w-full"
+              >
+                ← Back to Mode Selection
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Show lobby for current room
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-8 max-w-md">
@@ -266,7 +361,7 @@ export const GameBoard = () => {
             <div>
               <h3 className="text-lg font-semibold mb-2">Room Code</h3>
               <div className="text-4xl font-bold tracking-wider bg-primary px-4 py-2 rounded-lg text-primary-foreground">
-                {gameState.roomCode}
+                {currentRoom.room_code}
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 Share this code with your friends
@@ -274,32 +369,38 @@ export const GameBoard = () => {
             </div>
             
             <div className="border-t pt-4">
-              <h4 className="font-medium mb-2">Connected Players (1/5)</h4>
+              <h4 className="font-medium mb-2">Connected Players ({players.length}/{currentRoom.max_players})</h4>
               <div className="space-y-1">
-                <div className="bg-muted/50 p-2 rounded">You (Host)</div>
-                <div className="text-muted-foreground text-sm">Waiting for players...</div>
+                {players.map((player) => (
+                  <div key={player.id} className="bg-muted/50 p-2 rounded flex justify-between items-center">
+                    <span>{player.display_name}</span>
+                    {player.is_host && <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">Host</span>}
+                  </div>
+                ))}
+                {players.length < currentRoom.max_players && (
+                  <div className="text-muted-foreground text-sm">Waiting for more players...</div>
+                )}
               </div>
             </div>
             
             <div className="space-y-2 pt-4">
               <Button 
-                onClick={() => startNewGame(4)}
+                onClick={() => startNewGame(players.length)}
                 className="w-full"
-                disabled={true}
+                disabled={players.length < 2}
               >
-                Start Game (Need Supabase)
+                Start Game ({players.length < 2 ? 'Need 2+ players' : 'Ready!'})
               </Button>
               <Button 
-                onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))}
+                onClick={() => {
+                  leaveRoom();
+                  setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }));
+                }}
                 variant="outline"
                 className="w-full"
               >
-                Back to Menu
+                Leave Room
               </Button>
-            </div>
-            
-            <div className="text-xs text-muted-foreground bg-muted/20 p-3 rounded">
-              💡 Online multiplayer requires Supabase integration for real-time gameplay
             </div>
           </div>
         </div>
@@ -526,6 +627,14 @@ export const GameBoard = () => {
           cardSize="md"
         />
       </div>
-    </div>
+     </div>
+   );
+ };
+
+export const GameBoard = () => {
+  return (
+    <AuthCheck>
+      <GameBoardContent />
+    </AuthCheck>
   );
 };
