@@ -67,7 +67,9 @@ interface GameState {
   currentSequence: number;
   currentPlayer: number;
   playerCount: number;
-  gamePhase: "setup" | "playing" | "finished";
+  gamePhase: "modeSelect" | "setup" | "lobby" | "playing" | "finished";
+  gameMode: "local" | "online" | null;
+  roomCode: string | null;
   winner: number | null;
 }
 
@@ -79,7 +81,9 @@ export const GameBoard = () => {
     currentSequence: 1,
     currentPlayer: 0,
     playerCount: 4,
-    gamePhase: "setup",
+    gamePhase: "modeSelect",
+    gameMode: null,
+    roomCode: null,
     winner: null
   });
 
@@ -104,8 +108,38 @@ export const GameBoard = () => {
       currentPlayer: 0,
       playerCount,
       gamePhase: "playing",
+      gameMode: gameState.gameMode,
+      roomCode: gameState.roomCode,
       winner: null
     });
+  };
+
+  const generateRoomCode = (): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < 4; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const selectGameMode = (mode: "local" | "online") => {
+    if (mode === "local") {
+      setGameState(prev => ({
+        ...prev,
+        gameMode: mode,
+        gamePhase: "setup"
+      }));
+    } else {
+      // Online mode - create room
+      const roomCode = generateRoomCode();
+      setGameState(prev => ({
+        ...prev,
+        gameMode: mode,
+        roomCode,
+        gamePhase: "lobby"
+      }));
+    }
   };
 
   const handleCardPlay = (card: Card, playerIndex: number) => {
@@ -168,32 +202,145 @@ export const GameBoard = () => {
     });
   };
 
+  if (gameState.gamePhase === "modeSelect") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-8 max-w-md">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              7-ate-9
+            </h1>
+            <p className="text-muted-foreground">
+              Race to empty your hand by playing cards in sequence (1→2→3...→9→1). 
+              Use wild cards strategically to disrupt opponents!
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Choose Game Mode</h2>
+            
+            <div className="grid gap-4">
+              <Button
+                onClick={() => selectGameMode("local")}
+                variant="outline"
+                className="h-20 text-left p-6 hover:bg-primary/5"
+              >
+                <div className="space-y-1">
+                  <div className="font-semibold text-lg">🏠 Local Game</div>
+                  <div className="text-sm text-muted-foreground">
+                    Pass-and-play on this device (3-5 players)
+                  </div>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => selectGameMode("online")}
+                variant="outline"
+                className="h-20 text-left p-6 hover:bg-primary/5"
+              >
+                <div className="space-y-1">
+                  <div className="font-semibold text-lg">🌐 Online Game</div>
+                  <div className="text-sm text-muted-foreground">
+                    Play with friends on different devices
+                  </div>
+                </div>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState.gamePhase === "lobby") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-8 max-w-md">
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Online Game Lobby
+          </h1>
+          
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-card-border space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Room Code</h3>
+              <div className="text-4xl font-bold tracking-wider bg-primary px-4 py-2 rounded-lg text-primary-foreground">
+                {gameState.roomCode}
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Share this code with your friends
+              </p>
+            </div>
+            
+            <div className="border-t pt-4">
+              <h4 className="font-medium mb-2">Connected Players (1/5)</h4>
+              <div className="space-y-1">
+                <div className="bg-muted/50 p-2 rounded">You (Host)</div>
+                <div className="text-muted-foreground text-sm">Waiting for players...</div>
+              </div>
+            </div>
+            
+            <div className="space-y-2 pt-4">
+              <Button 
+                onClick={() => startNewGame(4)}
+                className="w-full"
+                disabled={true}
+              >
+                Start Game (Need Supabase)
+              </Button>
+              <Button 
+                onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))}
+                variant="outline"
+                className="w-full"
+              >
+                Back to Menu
+              </Button>
+            </div>
+            
+            <div className="text-xs text-muted-foreground bg-muted/20 p-3 rounded">
+              💡 Online multiplayer requires Supabase integration for real-time gameplay
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (gameState.gamePhase === "setup") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-6">
-          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            7-ate-9
-          </h1>
-          <p className="text-muted-foreground max-w-md">
-            Race to empty your hand by playing cards in sequence (1→2→3...→9→1). 
-            Use wild cards strategically to disrupt opponents!
-          </p>
           <div className="space-y-2">
-            <p className="text-sm font-medium">Select number of players:</p>
-            <div className="flex gap-2 justify-center">
+            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Local Game Setup
+            </h1>
+            <p className="text-muted-foreground">
+              Pass the device around for each player's turn
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            <p className="text-lg font-medium">Select number of players:</p>
+            <div className="flex gap-3 justify-center">
               {[3, 4, 5].map(count => (
                 <Button
                   key={count}
                   onClick={() => startNewGame(count)}
                   variant="outline"
-                  className="w-12 h-12"
+                  className="w-16 h-16 text-lg font-bold"
                 >
                   {count}
                 </Button>
               ))}
             </div>
           </div>
+          
+          <Button 
+            onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))}
+            variant="ghost"
+            className="mt-4"
+          >
+            ← Back to Mode Selection
+          </Button>
         </div>
       </div>
     );
