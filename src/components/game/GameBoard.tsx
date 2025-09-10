@@ -9,7 +9,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useGameRoom } from "@/hooks/useGameRoom";
 import { useAIPlayers } from "@/hooks/useAIPlayers";
-import { MessageCircle } from "lucide-react";
+import { useGameScoring } from "@/hooks/useGameScoring";
+import { useAuth } from "@/components/auth/AuthContext";
+import { Leaderboard } from "@/components/leaderboard/Leaderboard";
+import { MessageCircle, Trophy, LogIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 // 7-ate-9 deck creation
@@ -98,8 +102,12 @@ const GameBoardContent = () => {
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [showChat, setShowChat] = useState(true);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom, sessionId } = useGameRoom();
   const { makeAIMove, initializeAI, aiThinking } = useAIPlayers();
+  const { awardPointsForWin, recordGamePlayed } = useGameScoring();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const startNewGame = (playerCount: number = 4) => {
     const fullDeck = createFullDeck();
@@ -222,6 +230,17 @@ const GameBoardContent = () => {
       let winner = null;
       if (newPlayerHands[playerIndex].length === 0) {
         winner = playerIndex;
+        
+        // Award points for wins in online/AI mode
+        if ((gameState.gameMode === 'online' || gameState.gameMode === 'ai') && user) {
+          if (winner === 0 || (gameState.gameMode === 'ai' && winner === 0)) {
+            // Human player won
+            setTimeout(() => awardPointsForWin(gameState.gameMode), 1000);
+          } else {
+            // Record the game as played (loss)
+            setTimeout(() => recordGamePlayed(gameState.gameMode), 1000);
+          }
+        }
       }
       
       setGameState({
@@ -277,6 +296,40 @@ const GameBoardContent = () => {
             </p>
           </div>
           
+          {/* Auth section */}
+          <div className="p-4 bg-card/50 rounded-lg border">
+            {user ? (
+              <div className="space-y-2">
+                <p className="text-sm">Welcome back, <span className="font-medium">{user.email}</span>!</p>
+                <div className="flex gap-2 justify-center">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowLeaderboard(!showLeaderboard)}
+                  >
+                    <Trophy className="h-4 w-4 mr-1" />
+                    Leaderboard
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={signOut}>
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Sign in to track wins and compete!</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate('/auth')}
+                >
+                  <LogIn className="h-4 w-4 mr-1" />
+                  Sign In
+                </Button>
+              </div>
+            )}
+          </div>
+          
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Choose Game Mode</h2>
             
@@ -321,6 +374,13 @@ const GameBoardContent = () => {
               </Button>
             </div>
           </div>
+
+          {/* Leaderboard overlay */}
+          {showLeaderboard && (
+            <div className="mt-8 w-full max-w-md">
+              <Leaderboard />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -569,7 +629,10 @@ const GameBoardContent = () => {
       {gameState.winner !== null && (
         <div className="text-center mb-4 md:mb-6">
           <div className="bg-primary text-primary-foreground px-4 py-2 md:px-6 md:py-3 rounded-lg inline-block">
-            🎉 Player {gameState.winner + 1} Wins! 🎉
+            🎉 {gameState.gameMode === "ai" && gameState.winner > 0 ? `AI Player ${gameState.winner}` : `Player ${gameState.winner + 1}`} Wins! 🎉
+            {(gameState.gameMode === 'online' || gameState.gameMode === 'ai') && gameState.winner === 0 && user && (
+              <div className="text-sm mt-1">+1 point earned!</div>
+            )}
           </div>
         </div>
       )}

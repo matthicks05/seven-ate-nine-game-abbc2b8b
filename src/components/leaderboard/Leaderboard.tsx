@@ -1,50 +1,91 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Medal, Award } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/auth/AuthContext';
 
 interface LeaderboardEntry {
   user_id: string;
   points: number;
   games_won: number;
   games_played: number;
-  profiles: {
-    display_name: string;
-  };
+  display_name: string;
+  rank: number;
 }
 
 export const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchLeaderboard();
-  }, []);
+  }, [user]);
 
   const fetchLeaderboard = async () => {
     try {
-      const { data, error } = await supabase
+      // Get top 10 players with separate queries to avoid join issues
+      const { data: topScores } = await supabase
         .from('user_scores')
-        .select(`
-          user_id,
-          points,
-          games_won,
-          games_played,
-          profiles (
-            display_name
-          )
-        `)
+        .select('user_id, points, games_won, games_played')
         .order('points', { ascending: false })
         .limit(10);
 
-      if (error) {
-        console.error('Error fetching leaderboard:', error);
+      if (!topScores) {
+        setLoading(false);
         return;
       }
 
-      setLeaderboard(data || []);
+      // Get profiles for these users
+      const userIds = topScores.map(score => score.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', userIds);
+
+      // Get current user's rank if logged in
+      let currentUserRank = null;
+      if (user) {
+        const { data: allScores } = await supabase
+          .from('user_scores')
+          .select('user_id, points, games_won, games_played')
+          .order('points', { ascending: false });
+
+        if (allScores) {
+          const userIndex = allScores.findIndex(entry => entry.user_id === user.id);
+          if (userIndex !== -1) {
+            const { data: userProfile } = await supabase
+              .from('profiles')
+              .select('display_name')
+              .eq('id', user.id)
+              .single();
+
+            currentUserRank = {
+              ...allScores[userIndex],
+              display_name: userProfile?.display_name || 'Anonymous',
+              rank: userIndex + 1
+            };
+          }
+        }
+      }
+
+      // Combine scores with profiles
+      const formattedLeaderboard = topScores.map((score, index) => {
+        const profile = profiles?.find(p => p.id === score.user_id);
+        return {
+          user_id: score.user_id,
+          points: score.points,
+          games_won: score.games_won,
+          games_played: score.games_played,
+          display_name: profile?.display_name || 'Anonymous',
+          rank: index + 1
+        };
+      });
+
+      setLeaderboard(formattedLeaderboard);
+      setUserRank(currentUserRank);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     } finally {
@@ -61,7 +102,7 @@ export const Leaderboard = () => {
       case 3:
         return <Award className="h-5 w-5 text-amber-600" />;
       default:
-        return <span className="font-bold text-muted-foreground">#{rank}</span>;
+        return <span className="text-sm font-bold text-muted-foreground">#{rank}</span>;
     }
   };
 
@@ -72,76 +113,82 @@ export const Leaderboard = () => {
 
   if (loading) {
     return (
-      <Card className="w-full max-w-2xl">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Leaderboard
-          </CardTitle>
-          <CardDescription>Top players by points earned</CardDescription>
+          <CardTitle>Leaderboard</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <Skeleton className="h-4 flex-1" />
-              <Skeleton className="h-6 w-16" />
-            </div>
-          ))}
+        <CardContent>
+          <div className="text-center py-8">Loading...</div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5" />
+          <Trophy className="h-5 w-5 text-yellow-500" />
           Leaderboard
         </CardTitle>
         <CardDescription>
-          Top players by points earned in online and AI games
+          Top players by points earned (online & AI games only)
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {leaderboard.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            No scores yet. Be the first to play and earn points!
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {leaderboard.map((entry, index) => (
-              <div
-                key={entry.user_id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  index < 3 ? 'bg-muted/50' : 'bg-background'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8">
-                    {getRankIcon(index + 1)}
-                  </div>
-                  
-                  <div>
-                    <p className="font-medium">
-                      {entry.profiles.display_name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {entry.games_won} wins • {getWinRate(entry.games_won, entry.games_played)} win rate
-                    </p>
+        <div className="space-y-3">
+          {leaderboard.map((entry) => (
+            <div
+              key={entry.user_id}
+              className={`flex items-center justify-between p-3 rounded-lg border ${
+                entry.user_id === user?.id 
+                  ? 'bg-primary/5 border-primary/20' 
+                  : 'bg-muted/30'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                {getRankIcon(entry.rank)}
+                <div>
+                  <div className="font-medium">{entry.display_name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {entry.games_won}W / {entry.games_played}P • {getWinRate(entry.games_won, entry.games_played)} win rate
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-2">
+              </div>
+              <Badge variant="secondary" className="font-bold">
+                {entry.points} pts
+              </Badge>
+            </div>
+          ))}
+
+          {userRank && userRank.rank > 10 && (
+            <>
+              <div className="border-t pt-3 mt-6">
+                <div className="text-sm text-muted-foreground mb-2">Your Rank:</div>
+                <div className="flex items-center justify-between p-3 rounded-lg border bg-primary/5 border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-bold text-muted-foreground">#{userRank.rank}</span>
+                    <div>
+                      <div className="font-medium">{userRank.display_name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {userRank.games_won}W / {userRank.games_played}P • {getWinRate(userRank.games_won, userRank.games_played)} win rate
+                      </div>
+                    </div>
+                  </div>
                   <Badge variant="secondary" className="font-bold">
-                    {entry.points} pts
+                    {userRank.points} pts
                   </Badge>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </>
+          )}
+
+          {leaderboard.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              No players on the leaderboard yet. Be the first to win a game!
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
