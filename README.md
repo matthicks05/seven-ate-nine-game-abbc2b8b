@@ -1,6 +1,27 @@
-# Welcome to your Lovable project
+# 7-ate-9 - Multiplayer Card Game
 
-## Project info
+A real-time multiplayer implementation of the popular card game 7-ate-9, inspired by Jackbox Games' room-based multiplayer approach.
+
+## About the Game
+
+7-ate-9 is a fast-paced sequential card game where players race to empty their hands by playing cards in numerical order (1→2→3→4→5→6→7→8→9→1). The game features special wild cards that add strategic depth and chaos to gameplay.
+
+### Game Features
+
+- **Room-based Multiplayer**: Join games using 4-letter room codes (like Jackbox Games)
+- **Real-time Gameplay**: Live updates using Supabase real-time subscriptions
+- **No Account Required**: Play instantly with just a display name
+- **Wild Cards**: 9 different special cards including ATE, ADD, Divide, British 3, Slice of Pi, NU-UH, Cannibal, Mr Negativity, and Two Tickles
+- **Up to 5 Players**: Perfect for small groups
+
+### How to Play
+
+1. **Create or Join**: Host creates a room and shares the 4-letter code, or join an existing room
+2. **Sequential Play**: Play cards following the sequence 1→2→3→4→5→6→7→8→9→1
+3. **Win Condition**: First player to empty their hand wins
+4. **Wild Cards**: Use special cards strategically to disrupt opponents or help yourself
+
+## Project Info
 
 **URL**: https://lovable.dev/projects/a29414c6-7187-427d-8bc0-ad8f074f2f7f
 
@@ -50,15 +71,22 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Technical Implementation
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Frontend**: React, TypeScript, Vite
+- **UI Components**: shadcn-ui, Tailwind CSS  
+- **Backend**: Supabase (PostgreSQL database, real-time subscriptions)
+- **Game Logic**: Custom card game engine with wild card effects
+- **Multiplayer**: Room-based system using session IDs (no authentication required)
+
+### Architecture
+
+- **Real-time Updates**: Supabase subscriptions sync game state across all players
+- **Session Management**: Browser localStorage generates unique session IDs  
+- **Game State**: Centralized game logic with card validation and wild card effects
+- **Room System**: 4-letter codes for easy game discovery and joining
 
 ## How can I deploy this project?
 
