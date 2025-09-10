@@ -14,7 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_players: {
+        Row: {
+          display_name: string
+          id: string
+          is_host: boolean
+          joined_at: string
+          player_index: number
+          room_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          display_name: string
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          player_index: number
+          room_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          player_index?: number
+          room_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "game_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_rooms: {
+        Row: {
+          created_at: string
+          current_players: number
+          game_state: Json | null
+          host_id: string | null
+          id: string
+          max_players: number
+          room_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_players?: number
+          game_state?: Json | null
+          host_id?: string | null
+          id?: string
+          max_players?: number
+          room_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_players?: number
+          game_state?: Json | null
+          host_id?: string | null
+          id?: string
+          max_players?: number
+          room_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
