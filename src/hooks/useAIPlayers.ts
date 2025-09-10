@@ -34,7 +34,8 @@ export const useAIPlayers = () => {
       return newThinking;
     });
 
-    // AI plays instantly
+    // Small thinking delay for natural feel
+    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
 
     const aiHand = gameState.playerHands[aiPlayerIndex];
     const currentTop = gameState.currentSequence;
