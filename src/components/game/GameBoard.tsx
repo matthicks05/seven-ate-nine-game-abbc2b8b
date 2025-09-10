@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { GameZone } from "./GameZone";
 import { GameCard, Card } from "./GameCard";
+import { GameRulesModal } from "./GameRulesModal";
+import { PlayerStatsModal } from "./PlayerStatsModal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -347,14 +349,33 @@ export const GameBoard = () => {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+    <div className="min-h-screen p-2 md:p-4">
+      {/* Mobile Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg md:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             7-ate-9
           </h1>
-          <div className="flex items-center gap-4 text-sm">
+          {/* Mobile: Show current sequence prominently */}
+          <div className="md:hidden bg-gradient-primary px-3 py-1 rounded-full">
+            <span className="text-primary-foreground font-bold">Next: {gameState.currentSequence}</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {/* Mobile: Compact action buttons */}
+          <div className="md:hidden flex gap-1">
+            <GameRulesModal />
+            <PlayerStatsModal 
+              playerHands={gameState.playerHands}
+              currentPlayer={gameState.currentPlayer}
+              deckLength={gameState.deck.length}
+              discardLength={gameState.discardPile.length}
+            />
+          </div>
+          
+          {/* Desktop: Full header info */}
+          <div className="hidden md:flex items-center gap-4 text-sm">
             <span className="bg-muted px-3 py-1 rounded-full">
               Next: {gameState.currentSequence}
             </span>
@@ -362,22 +383,67 @@ export const GameBoard = () => {
               Player {gameState.currentPlayer + 1}'s Turn
             </span>
           </div>
+          
+          <Button 
+            onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))} 
+            variant="outline"
+            size="sm"
+          >
+            New Game
+          </Button>
         </div>
-        <Button onClick={() => setGameState(prev => ({ ...prev, gamePhase: "setup" }))} variant="outline">
-          New Game
-        </Button>
+      </div>
+
+      {/* Mobile: Current player indicator */}
+      <div className="md:hidden text-center mb-4">
+        <div className="bg-primary px-4 py-2 rounded-full text-primary-foreground inline-block">
+          Player {gameState.currentPlayer + 1}'s Turn
+        </div>
       </div>
 
       {gameState.winner !== null && (
-        <div className="text-center mb-6">
-          <div className="bg-primary text-primary-foreground px-6 py-3 rounded-lg inline-block">
+        <div className="text-center mb-4 md:mb-6">
+          <div className="bg-primary text-primary-foreground px-4 py-2 md:px-6 md:py-3 rounded-lg inline-block">
             🎉 Player {gameState.winner + 1} Wins! 🎉
           </div>
         </div>
       )}
 
-      {/* Main Game Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      {/* Mobile-First Layout */}
+      <div className="space-y-4 md:hidden">
+        {/* Mobile: Center sequence indicator prominently */}
+        <div className="text-center">
+          <div className="w-20 h-28 bg-gradient-primary rounded-lg flex items-center justify-center border-4 border-primary-glow mx-auto">
+            <span className="text-3xl font-bold text-primary-foreground">{gameState.currentSequence}</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Sequence: 1→2→3→4→5→6→7→8→9→1
+          </p>
+        </div>
+
+        {/* Mobile: Deck and discard in one row */}
+        <div className="grid grid-cols-2 gap-2">
+          <GameZone
+            title={`Draw (${gameState.deck.length})`}
+            cards={gameState.deck.length > 0 ? [{ ...gameState.deck[gameState.deck.length - 1], isVisible: false }] : []}
+            layout="stack"
+            onCardClick={handleDrawCard}
+            className="bg-muted/30"
+            cardSize="sm"
+          />
+          
+          <GameZone
+            title="Played"
+            cards={gameState.discardPile}
+            layout="stack"
+            className="bg-card/50"
+            cardSize="sm"
+          />
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         
         {/* Left - Deck and Discard */}
         <div className="space-y-4">
@@ -410,7 +476,7 @@ export const GameBoard = () => {
           </div>
         </div>
 
-        {/* Right - Game Stats */}
+        {/* Right - Game Stats (Desktop Only) */}
         <div className="space-y-4">
           <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-card-border">
             <h3 className="text-lg font-semibold mb-4 text-center">Players</h3>
@@ -449,14 +515,15 @@ export const GameBoard = () => {
         </div>
       </div>
 
-      {/* Current Player's Hand */}
-      <div className="mt-8">
+      {/* Player Hand - Mobile Optimized */}
+      <div className="mt-4 md:mt-8">
         <GameZone
           title={`Your Hand (Player ${gameState.currentPlayer + 1})`}
           cards={gameState.playerHands[gameState.currentPlayer] || []}
           layout="fan"
           onCardClick={(card) => handleCardPlay(card, gameState.currentPlayer)}
           className="bg-card/30 backdrop-blur-sm border border-card-border"
+          cardSize="md"
         />
       </div>
     </div>
