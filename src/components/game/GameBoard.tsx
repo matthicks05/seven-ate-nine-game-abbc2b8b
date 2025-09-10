@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GameZone } from "./GameZone";
 import { GameCard, Card } from "./GameCard";
 import { GameRulesModal } from "./GameRulesModal";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useGameRoom } from "@/hooks/useGameRoom";
+import { useAIPlayers } from "@/hooks/useAIPlayers";
 import { MessageCircle } from "lucide-react";
 
 
@@ -74,8 +75,8 @@ interface GameState {
   currentSequence: number;
   currentPlayer: number;
   playerCount: number;
-  gamePhase: "modeSelect" | "setup" | "lobby" | "playing" | "finished";
-  gameMode: "local" | "online" | null;
+  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished";
+  gameMode: "local" | "online" | "ai" | null;
   roomCode: string | null;
   winner: number | null;
 }
@@ -98,6 +99,7 @@ const GameBoardContent = () => {
   const [displayName, setDisplayName] = useState("");
   const [showChat, setShowChat] = useState(true);
   const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom, sessionId } = useGameRoom();
+  const { makeAIMove, initializeAI, aiThinking } = useAIPlayers();
 
   const startNewGame = (playerCount: number = 4) => {
     const fullDeck = createFullDeck();
@@ -124,6 +126,11 @@ const GameBoardContent = () => {
       roomCode: gameState.roomCode,
       winner: null
     });
+
+    // Initialize AI if in AI mode
+    if (gameState.gameMode === "ai") {
+      initializeAI(playerCount);
+    }
   };
 
   const generateRoomCode = (): string => {
@@ -135,12 +142,18 @@ const GameBoardContent = () => {
     return result;
   };
 
-  const selectGameMode = (mode: "local" | "online") => {
+  const selectGameMode = (mode: "local" | "online" | "ai") => {
     if (mode === "local") {
       setGameState(prev => ({
         ...prev,
         gameMode: mode,
         gamePhase: "setup"
+      }));
+    } else if (mode === "ai") {
+      setGameState(prev => ({
+        ...prev,
+        gameMode: mode,
+        gamePhase: "aiSetup"
       }));
     } else {
       // Online mode - go to join/create selection
@@ -238,6 +251,18 @@ const GameBoardContent = () => {
     });
   };
 
+  // Effect to handle AI moves
+  useEffect(() => {
+    if (gameState.gameMode === "ai" && gameState.gamePhase === "playing" && !gameState.winner) {
+      const currentPlayer = gameState.currentPlayer;
+      const isAITurn = currentPlayer > 0; // Player 0 is human, others are AI
+      
+      if (isAITurn && !aiThinking[currentPlayer]) {
+        makeAIMove(gameState, currentPlayer, handleCardPlay, handleDrawCard);
+      }
+    }
+  }, [gameState, aiThinking, makeAIMove]);
+
   if (gameState.gamePhase === "modeSelect") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -278,6 +303,19 @@ const GameBoardContent = () => {
                   <div className="font-semibold text-lg">🌐 Online Game</div>
                   <div className="text-sm text-muted-foreground">
                     Play with friends on different devices
+                  </div>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => selectGameMode("ai")}
+                variant="outline"
+                className="h-20 text-left p-6 hover:bg-primary/5"
+              >
+                <div className="space-y-1">
+                  <div className="font-semibold text-lg">🤖 AI Mode</div>
+                  <div className="text-sm text-muted-foreground">
+                    Play against AI opponents (max 5 players)
                   </div>
                 </div>
               </Button>
@@ -411,23 +449,28 @@ const GameBoardContent = () => {
     );
   }
 
-  if (gameState.gamePhase === "setup") {
+  if (gameState.gamePhase === "setup" || gameState.gamePhase === "aiSetup") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-6">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Local Game Setup
+              {gameState.gamePhase === "aiSetup" ? "AI Game Setup" : "Local Game Setup"}
             </h1>
             <p className="text-muted-foreground">
-              Pass the device around for each player's turn
+              {gameState.gamePhase === "aiSetup" 
+                ? "You'll play as Player 1, AI controls the rest" 
+                : "Pass the device around for each player's turn"
+              }
             </p>
           </div>
           
           <div className="space-y-4">
-            <p className="text-lg font-medium">Select number of players:</p>
+            <p className="text-lg font-medium">
+              Select number of {gameState.gamePhase === "aiSetup" ? "AI opponents" : "players"}:
+            </p>
             <div className="flex gap-3 justify-center">
-              {[3, 4, 5].map(count => (
+              {(gameState.gamePhase === "aiSetup" ? [2, 3, 4, 5] : [3, 4, 5]).map(count => (
                 <Button
                   key={count}
                   onClick={() => startNewGame(count)}
@@ -438,6 +481,11 @@ const GameBoardContent = () => {
                 </Button>
               ))}
             </div>
+            {gameState.gamePhase === "aiSetup" && (
+              <p className="text-sm text-muted-foreground text-center">
+                AI players will automatically play their turns
+              </p>
+            )}
           </div>
           
           <Button 
@@ -607,7 +655,8 @@ const GameBoardContent = () => {
                     "font-medium",
                     index === gameState.currentPlayer && "text-primary"
                   )}>
-                    Player {index + 1}
+                    {gameState.gameMode === "ai" && index > 0 ? `AI Player ${index}` : `Player ${index + 1}`}
+                    {aiThinking[index] && gameState.gameMode === "ai" && " (thinking...)"}
                   </span>
                   <span className="text-sm">{hand.length} cards</span>
                 </div>
