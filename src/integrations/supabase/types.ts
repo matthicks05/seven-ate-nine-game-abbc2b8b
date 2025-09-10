@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      banned_users: {
+        Row: {
+          banned_until: string
+          created_at: string
+          id: string
+          player_name: string
+          reason: string | null
+          room_id: string
+          session_id: string
+        }
+        Insert: {
+          banned_until: string
+          created_at?: string
+          id?: string
+          player_name: string
+          reason?: string | null
+          room_id: string
+          session_id: string
+        }
+        Update: {
+          banned_until?: string
+          created_at?: string
+          id?: string
+          player_name?: string
+          reason?: string | null
+          room_id?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_moderated: boolean | null
+          message: string
+          player_name: string
+          room_id: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_moderated?: boolean | null
+          message: string
+          player_name: string
+          room_id: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_moderated?: boolean | null
+          message?: string
+          player_name?: string
+          room_id?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       game_players: {
         Row: {
           display_name: string

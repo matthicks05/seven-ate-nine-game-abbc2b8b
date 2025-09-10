@@ -289,6 +289,7 @@ export const useGameRoom = () => {
     currentRoom,
     players,
     isLoading,
+    sessionId: getSessionId(),
     createRoom,
     joinRoom,
     leaveRoom,

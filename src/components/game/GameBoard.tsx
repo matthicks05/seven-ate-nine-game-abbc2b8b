@@ -3,10 +3,12 @@ import { GameZone } from "./GameZone";
 import { GameCard, Card } from "./GameCard";
 import { GameRulesModal } from "./GameRulesModal";
 import { PlayerStatsModal } from "./PlayerStatsModal";
+import ChatPanel from "../chat/ChatPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useGameRoom } from "@/hooks/useGameRoom";
+import { MessageCircle } from "lucide-react";
 
 
 // 7-ate-9 deck creation
@@ -94,7 +96,8 @@ const GameBoardContent = () => {
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom } = useGameRoom();
+  const [showChat, setShowChat] = useState(true);
+  const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom, sessionId } = useGameRoom();
 
   const startNewGame = (playerCount: number = 4) => {
     const fullDeck = createFullDeck();
@@ -451,49 +454,62 @@ const GameBoardContent = () => {
 
   return (
     <div className="min-h-screen p-2 md:p-4">
-      {/* Mobile Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg md:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            7-ate-9
-          </h1>
-          {/* Mobile: Show current sequence prominently */}
-          <div className="md:hidden bg-gradient-primary px-3 py-1 rounded-full">
-            <span className="text-primary-foreground font-bold">Next: {gameState.currentSequence}</span>
+      <div className="flex gap-4 max-w-7xl mx-auto">
+        {/* Main Game Area */}
+        <div className="flex-1">
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg md:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                7-ate-9
+              </h1>
+              {/* Mobile: Show current sequence prominently */}
+              <div className="md:hidden bg-gradient-primary px-3 py-1 rounded-full">
+                <span className="text-primary-foreground font-bold">Next: {gameState.currentSequence}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Mobile: Chat toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowChat(!showChat)}
+                className="md:hidden"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+              
+              {/* Mobile: Compact action buttons */}
+              <div className="md:hidden flex gap-1">
+                <GameRulesModal />
+                <PlayerStatsModal 
+                  playerHands={gameState.playerHands}
+                  currentPlayer={gameState.currentPlayer}
+                  deckLength={gameState.deck.length}
+                  discardLength={gameState.discardPile.length}
+                />
+              </div>
+              
+              {/* Desktop: Full header info */}
+              <div className="hidden md:flex items-center gap-4 text-sm">
+                <span className="bg-muted px-3 py-1 rounded-full">
+                  Next: {gameState.currentSequence}
+                </span>
+                <span className="bg-primary px-3 py-1 rounded-full text-primary-foreground">
+                  Player {gameState.currentPlayer + 1}'s Turn
+                </span>
+              </div>
+              
+              <Button 
+                onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))} 
+                variant="outline"
+                size="sm"
+              >
+                New Game
+              </Button>
+            </div>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {/* Mobile: Compact action buttons */}
-          <div className="md:hidden flex gap-1">
-            <GameRulesModal />
-            <PlayerStatsModal 
-              playerHands={gameState.playerHands}
-              currentPlayer={gameState.currentPlayer}
-              deckLength={gameState.deck.length}
-              discardLength={gameState.discardPile.length}
-            />
-          </div>
-          
-          {/* Desktop: Full header info */}
-          <div className="hidden md:flex items-center gap-4 text-sm">
-            <span className="bg-muted px-3 py-1 rounded-full">
-              Next: {gameState.currentSequence}
-            </span>
-            <span className="bg-primary px-3 py-1 rounded-full text-primary-foreground">
-              Player {gameState.currentPlayer + 1}'s Turn
-            </span>
-          </div>
-          
-          <Button 
-            onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))} 
-            variant="outline"
-            size="sm"
-          >
-            New Game
-          </Button>
-        </div>
-      </div>
 
       {/* Mobile: Current player indicator */}
       <div className="md:hidden text-center mb-4">
@@ -616,16 +632,42 @@ const GameBoardContent = () => {
         </div>
       </div>
 
-      {/* Player Hand - Mobile Optimized */}
-      <div className="mt-4 md:mt-8">
-        <GameZone
-          title={`Your Hand (Player ${gameState.currentPlayer + 1})`}
-          cards={gameState.playerHands[gameState.currentPlayer] || []}
-          layout="fan"
-          onCardClick={(card) => handleCardPlay(card, gameState.currentPlayer)}
-          className="bg-card/30 backdrop-blur-sm border border-card-border"
-          cardSize="md"
-        />
+          {/* Player Hand - Mobile Optimized */}
+          <div className="mt-4 md:mt-8">
+            <GameZone
+              title={`Your Hand (Player ${gameState.currentPlayer + 1})`}
+              cards={gameState.playerHands[gameState.currentPlayer] || []}
+              layout="fan"
+              onCardClick={(card) => handleCardPlay(card, gameState.currentPlayer)}
+              className="bg-card/30 backdrop-blur-sm border border-card-border"
+              cardSize="md"
+            />
+          </div>
+        </div>
+
+        {/* Chat Panel - Desktop */}
+        {showChat && gameState.gameMode === "online" && currentRoom && (
+          <div className="hidden md:block w-80 h-[80vh] sticky top-4">
+            <ChatPanel
+              roomId={currentRoom.room_code}
+              sessionId={sessionId || ''}
+              playerName={displayName || `Player ${gameState.currentPlayer + 1}`}
+              isVisible={showChat}
+            />
+          </div>
+        )}
+
+        {/* Chat Panel - Mobile (Overlay) */}
+        {showChat && gameState.gameMode === "online" && currentRoom && (
+          <div className="md:hidden fixed inset-x-4 bottom-4 top-20 z-50">
+            <ChatPanel
+              roomId={currentRoom.room_code}
+              sessionId={sessionId || ''}
+              playerName={displayName || `Player ${gameState.currentPlayer + 1}`}
+              isVisible={showChat}
+            />
+          </div>
+        )}
       </div>
      </div>
    );
