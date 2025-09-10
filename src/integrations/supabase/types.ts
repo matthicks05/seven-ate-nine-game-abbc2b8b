@@ -148,13 +148,75 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_scores: {
+        Row: {
+          created_at: string
+          games_played: number
+          games_won: number
+          id: string
+          last_game_at: string | null
+          points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          games_played?: number
+          games_won?: number
+          id?: string
+          last_game_at?: string | null
+          points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          games_played?: number
+          games_won?: number
+          id?: string
+          last_game_at?: string | null
+          points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      award_points: {
+        Args: { p_points?: number; p_user_id: string }
+        Returns: undefined
+      }
       cleanup_old_rooms: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      record_game_played: {
+        Args: { p_user_id: string }
         Returns: undefined
       }
     }
