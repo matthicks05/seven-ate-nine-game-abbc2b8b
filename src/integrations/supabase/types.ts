@@ -22,7 +22,7 @@ export type Database = {
           joined_at: string
           player_index: number
           room_id: string | null
-          user_id: string | null
+          session_id: string | null
         }
         Insert: {
           display_name: string
@@ -31,7 +31,7 @@ export type Database = {
           joined_at?: string
           player_index: number
           room_id?: string | null
-          user_id?: string | null
+          session_id?: string | null
         }
         Update: {
           display_name?: string
@@ -40,7 +40,7 @@ export type Database = {
           joined_at?: string
           player_index?: number
           room_id?: string | null
-          user_id?: string | null
+          session_id?: string | null
         }
         Relationships: [
           {
@@ -57,7 +57,7 @@ export type Database = {
           created_at: string
           current_players: number
           game_state: Json | null
-          host_id: string | null
+          host_session_id: string | null
           id: string
           max_players: number
           room_code: string
@@ -68,7 +68,7 @@ export type Database = {
           created_at?: string
           current_players?: number
           game_state?: Json | null
-          host_id?: string | null
+          host_session_id?: string | null
           id?: string
           max_players?: number
           room_code: string
@@ -79,7 +79,7 @@ export type Database = {
           created_at?: string
           current_players?: number
           game_state?: Json | null
-          host_id?: string | null
+          host_session_id?: string | null
           id?: string
           max_players?: number
           room_code?: string
@@ -93,7 +93,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_rooms: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
