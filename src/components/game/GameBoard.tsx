@@ -1174,8 +1174,8 @@ const GameBoardContent = () => {
         <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
-              title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
-              cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `p2-${index}`, isVisible: false })) || []}
+              title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
+              cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
               cardSize="md"
               layout="fan"
               className="scale-75"
@@ -1187,8 +1187,8 @@ const GameBoardContent = () => {
         <div className="absolute left-1/2 top-1/3 transform -translate-x-[405px] -translate-y-1/2 -rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
-              title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
-              cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
+              title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
+              cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `p2-${index}`, isVisible: false })) || []}
               cardSize="md"
               layout="fan"
               className="scale-75"
