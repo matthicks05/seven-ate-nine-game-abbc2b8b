@@ -863,27 +863,27 @@ const GameBoardContent = () => {
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
                   <h4 className="font-medium text-accent mb-2">🇬🇧 British 3</h4>
-                  <p className="text-muted-foreground">Special wild card with unique British-themed effect</p>
+                  <p className="text-muted-foreground">All players draw one card</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
                   <h4 className="font-medium text-accent mb-2">🥧 Slice Pi</h4>
-                  <p className="text-muted-foreground">Mathematical wild card with π-based effects</p>
+                  <p className="text-muted-foreground">Discard all 1s, 2s, 3s, and 4s from hand</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🚫 Nuuh Card</h4>
-                  <p className="text-muted-foreground">Blocks or negates certain actions from other players</p>
+                  <h4 className="font-medium text-accent mb-2">🚫 Nu-uh Card</h4>
+                  <p className="text-muted-foreground">Skip drawing, skip turn, or cancel another card's effect</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🍖 Cannibal Card</h4>
-                  <p className="text-muted-foreground">Consumes cards from other players or the deck</p>
+                  <h4 className="font-medium text-accent mb-2">🍽️ Cannibal Card</h4>
+                  <p className="text-muted-foreground">Discard 2 of your cards, all others draw 1</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">➖ Negativity Card</h4>
-                  <p className="text-muted-foreground">Reverses effects or creates negative impacts</p>
+                  <h4 className="font-medium text-accent mb-2">😠 Mr Negativity</h4>
+                  <p className="text-muted-foreground">Play any 3 cards lower than last played card</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">😄 Tickles Card</h4>
-                  <p className="text-muted-foreground">Light-hearted wild card with playful effects</p>
+                  <h4 className="font-medium text-accent mb-2">😄 Two Tickles</h4>
+                  <p className="text-muted-foreground">Choose 2 players to each draw 2 cards</p>
                 </div>
               </div>
             </div>
