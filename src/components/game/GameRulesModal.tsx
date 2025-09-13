@@ -46,27 +46,27 @@ export const GameRulesModal = ({ isOpen, onClose }: GameRulesModalProps) => {
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">3🇬🇧 (British 3)</span>
-                <span className="text-muted-foreground">All players draw 1 card</span>
+                <span className="text-muted-foreground">All players draw one card</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">π (Slice of Pi)</span>
-                <span className="text-muted-foreground">Discard all 1s, 2s, 3s, and 4s</span>
+                <span className="text-muted-foreground">Discard all 1s, 2s, 3s, and 4s from hand</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">NU-UH</span>
-                <span className="text-muted-foreground">Skip, cancel, or avoid drawing</span>
+                <span className="text-muted-foreground">Skip drawing, skip turn, or cancel another card's effect</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">🍽️ (Cannibal)</span>
-                <span className="text-muted-foreground">Discard 2 cards, others draw 1</span>
+                <span className="text-muted-foreground">Discard 2 of your cards, all others draw 1</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">-1 (Mr Negativity)</span>
-                <span className="text-muted-foreground">Play 3 cards lower than sequence</span>
+                <span className="text-muted-foreground">Play any 3 cards lower than last played card</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">2👋 (Two Tickles)</span>
-                <span className="text-muted-foreground">Choose 2 players to draw 2 cards</span>
+                <span className="text-muted-foreground">Choose 2 players to each draw 2 cards</span>
               </div>
             </div>
           </div>
