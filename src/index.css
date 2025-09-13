@@ -6,52 +6,52 @@
 
 @layer base {
   :root {
-    /* Game Table Background */
-    --game-table: 120 30% 15%;
-    --game-table-pattern: 120 25% 18%;
+    /* Game Table Background - Vibrant Purple/Blue */
+    --game-table: 260 85% 25%;
+    --game-table-pattern: 265 80% 35%;
     
-    /* Card Colors */
-    --card-background: 0 0% 98%;
-    --card-border: 220 13% 85%;
-    --card-shadow: 220 43% 11%;
+    /* Card Colors - Bright and Clean */
+    --card-background: 0 0% 100%;
+    --card-border: 260 20% 80%;
+    --card-shadow: 260 50% 15%;
     
-    /* Game Colors */
-    --primary: 240 73% 59%;
-    --primary-glow: 240 100% 70%;
+    /* Game Colors - Fun and Vibrant */
+    --primary: 280 100% 70%;
+    --primary-glow: 285 100% 85%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 280 65% 60%;
-    --secondary-glow: 280 85% 75%;
+    --secondary: 195 100% 65%;
+    --secondary-glow: 195 100% 80%;
     --secondary-foreground: 0 0% 100%;
     
-    --accent: 45 93% 58%;
-    --accent-glow: 45 100% 68%;
+    --accent: 45 100% 65%;
+    --accent-glow: 50 100% 75%;
     --accent-foreground: 25 85% 15%;
     
-    /* UI Colors */
-    --background: 220 27% 18%;
-    --foreground: 210 40% 98%;
+    /* UI Colors - Rich and Engaging */
+    --background: 265 60% 15%;
+    --foreground: 280 20% 95%;
     
-    --muted: 220 23% 22%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 265 40% 25%;
+    --muted-foreground: 265 15% 70%;
     
-    --border: 220 20% 25%;
-    --input: 220 23% 22%;
-    --ring: 240 73% 59%;
+    --border: 265 30% 35%;
+    --input: 265 40% 25%;
+    --ring: 280 100% 70%;
     
-    --destructive: 0 72% 51%;
+    --destructive: 0 85% 60%;
     --destructive-foreground: 0 0% 98%;
     
-    /* Gradients */
+    /* Gradients - Colorful and Dynamic */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-glow)));
     --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
     --gradient-table: radial-gradient(ellipse at center, hsl(var(--game-table-pattern)), hsl(var(--game-table)));
     
-    /* Shadows */
-    --shadow-card: 0 4px 12px -2px hsl(var(--card-shadow) / 0.3);
-    --shadow-card-hover: 0 8px 25px -5px hsl(var(--card-shadow) / 0.4);
-    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    /* Shadows - More Vibrant */
+    --shadow-card: 0 4px 12px -2px hsl(var(--card-shadow) / 0.4);
+    --shadow-card-hover: 0 8px 25px -5px hsl(var(--card-shadow) / 0.5);
+    --shadow-glow: 0 0 25px hsl(var(--primary) / 0.4);
     
     /* Animation Timings */
     --transition-card: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -60,19 +60,12 @@
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
