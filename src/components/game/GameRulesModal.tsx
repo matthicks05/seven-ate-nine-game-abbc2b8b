@@ -45,11 +45,11 @@ export const GameRulesModal = ({ isOpen, onClose }: GameRulesModalProps) => {
                 <span className="text-muted-foreground">Give half your cards to next player</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">🇬🇧 Cup of Three</span>
+                <span className="font-medium">🇬🇧 Cup of Three Card</span>
                 <span className="text-muted-foreground">All players draw one card</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">π (Slice of Pi)</span>
+                <span className="font-medium">π (Slice of Pi Card)</span>
                 <span className="text-muted-foreground">Discard all 1s, 2s, 3s, and 4s from hand</span>
               </div>
               <div className="flex justify-between">
@@ -61,11 +61,11 @@ export const GameRulesModal = ({ isOpen, onClose }: GameRulesModalProps) => {
                 <span className="text-muted-foreground">Discard 2 of your cards, all others draw 1</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">-1 (Mr Negativity)</span>
+                <span className="font-medium">-1 (Mr Negativity Card)</span>
                 <span className="text-muted-foreground">Play any 3 cards lower than last played card</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">2👋 (Two Tickles)</span>
+                <span className="font-medium">2👋 (Two Tickles Card)</span>
                 <span className="text-muted-foreground">Choose 2 players to each draw 2 cards</span>
               </div>
             </div>

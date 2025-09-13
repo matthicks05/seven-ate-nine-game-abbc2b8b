@@ -862,11 +862,11 @@ const GameBoardContent = () => {
                   <p className="text-muted-foreground">Give half your remaining cards to the next player</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🇬🇧 Cup of Three</h4>
+                  <h4 className="font-medium text-accent mb-2">🇬🇧 Cup of Three Card</h4>
                   <p className="text-muted-foreground">All players draw one card</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🥧 Slice of Pi</h4>
+                  <h4 className="font-medium text-accent mb-2">🥧 Slice of Pi Card</h4>
                   <p className="text-muted-foreground">Discard all 1s, 2s, 3s, and 4s from hand</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
@@ -878,11 +878,11 @@ const GameBoardContent = () => {
                   <p className="text-muted-foreground">Discard 2 of your cards, all others draw 1</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">😠 Mr Negativity</h4>
+                  <h4 className="font-medium text-accent mb-2">😠 Mr Negativity Card</h4>
                   <p className="text-muted-foreground">Play any 3 cards lower than last played card</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">😄 Two Tickles</h4>
+                  <h4 className="font-medium text-accent mb-2">😄 Two Tickles Card</h4>
                   <p className="text-muted-foreground">Choose 2 players to each draw 2 cards</p>
                 </div>
               </div>
