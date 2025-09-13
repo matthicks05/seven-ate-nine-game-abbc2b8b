@@ -304,44 +304,62 @@ const GameBoardContent = () => {
         nextSequence = gameState.currentSequence + 1;
         if (nextSequence > 9) nextSequence = 1;
       } else if (card.type === "wild" && card.wildType === "british3") {
-        // British 3 - Set sequence to 3 with British flair
-        nextSequence = 3;
-      } else if (card.type === "wild" && card.wildType === "slicepi") {
-        // Slice Pi - Mathematical effect using π (3.14159...) 
-        // Set sequence to 3 (integer part of π) and next player draws 1 card (for .14...)
-        nextSequence = 3;
-        const nextPlayerIdx = (playerIndex + 1) % gameState.playerCount;
-        if (newDeck.length > 0) {
-          const drawnCard = newDeck.pop()!;
-          newPlayerHands[nextPlayerIdx].push(drawnCard);
-        }
-      } else if (card.type === "wild" && card.wildType === "nuuh") {
-        // Nuuh Card - Blocks/negates - keeps current sequence (blocks normal progression)
-        nextSequence = gameState.currentSequence;
-      } else if (card.type === "wild" && card.wildType === "cannibal") {
-        // Cannibal Card - Consumes cards - takes 1 card from each other player
+        // British 3 (4): All players draw one card
         for (let i = 0; i < gameState.playerCount; i++) {
-          if (i !== playerIndex && newPlayerHands[i].length > 0) {
-            const stolenCard = newPlayerHands[i].pop()!;
-            newPlayerHands[playerIndex].push(stolenCard);
+          if (newDeck.length > 0) {
+            const drawnCard = newDeck.pop()!;
+            newPlayerHands[i].push(drawnCard);
           }
         }
-        nextSequence = gameState.currentSequence + 1;
-        if (nextSequence > 9) nextSequence = 1;
-      } else if (card.type === "wild" && card.wildType === "negativity") {
-        // Negativity Card - Reverses effects - goes backwards in sequence
-        nextSequence = gameState.currentSequence - 1;
-        if (nextSequence < 1) nextSequence = 9;
-      } else if (card.type === "wild" && card.wildType === "tickles") {
-        // Tickles Card - Playful effect - everyone except current player draws 1 card
+        nextSequence = 4; // British 3 has value 4
+      } else if (card.type === "wild" && card.wildType === "slicepi") {
+        // Slice of Pi (3): Discard all 1s, 2s, 3s, and 4s from hand
+        newPlayerHands[playerIndex] = newPlayerHands[playerIndex].filter(c => 
+          c.type === "wild" || (c.type === "number" && c.value > 4)
+        );
+        nextSequence = 3; // Slice of Pi has value 3
+      } else if (card.type === "wild" && card.wildType === "nuuh") {
+        // Nu-uh Card (5): Skip drawing, skip turn, or cancel another card's effect
+        // Skip next player by advancing twice
+        shouldAdvancePlayer = true;
+        nextSequence = 5; // Nu-uh has value 5
+      } else if (card.type === "wild" && card.wildType === "cannibal") {
+        // Cannibal Card (4): Discard 2 of your cards, all others draw 1
+        // Discard 2 cards from current player (if they have them)
+        if (newPlayerHands[playerIndex].length >= 2) {
+          newPlayerHands[playerIndex].splice(-2, 2);
+        } else if (newPlayerHands[playerIndex].length === 1) {
+          newPlayerHands[playerIndex].splice(-1, 1);
+        }
+        // All other players draw 1
         for (let i = 0; i < gameState.playerCount; i++) {
           if (i !== playerIndex && newDeck.length > 0) {
             const drawnCard = newDeck.pop()!;
             newPlayerHands[i].push(drawnCard);
           }
         }
-        nextSequence = gameState.currentSequence + 1;
-        if (nextSequence > 9) nextSequence = 1;
+        nextSequence = 4; // Cannibal has value 4
+      } else if (card.type === "wild" && card.wildType === "negativity") {
+        // Mr Negativity (5): Play any 3 cards lower than last played card
+        // This is complex - for now just set sequence to 5 and let player play normally
+        // TODO: Implement special state for playing 3 cards lower
+        nextSequence = 5; // Mr Negativity has value 5
+      } else if (card.type === "wild" && card.wildType === "tickles") {
+        // Two Tickles (5): Choose 2 players to each draw 2 cards
+        // For now, make the next 2 players draw 2 cards each
+        // TODO: Add player selection UI
+        let drawnFor = 0;
+        for (let i = 1; i <= gameState.playerCount && drawnFor < 2; i++) {
+          const targetPlayer = (playerIndex + i) % gameState.playerCount;
+          if (targetPlayer !== playerIndex) {
+            for (let j = 0; j < 2 && newDeck.length > 0; j++) {
+              const drawnCard = newDeck.pop()!;
+              newPlayerHands[targetPlayer].push(drawnCard);
+            }
+            drawnFor++;
+          }
+        }
+        nextSequence = 5; // Two Tickles has value 5
       } else {
         // Default wild card behavior
         nextSequence = gameState.currentSequence + 1;
@@ -365,7 +383,9 @@ const GameBoardContent = () => {
         }
       }
       
-      const nextPlayer = shouldAdvancePlayer ? (gameState.currentPlayer + 1) % gameState.playerCount : gameState.currentPlayer;
+      // Handle Nu-uh card's double advance
+      const advanceBy = (card.type === "wild" && card.wildType === "nuuh") ? 2 : 1;
+      const nextPlayer = shouldAdvancePlayer ? (gameState.currentPlayer + advanceBy) % gameState.playerCount : gameState.currentPlayer;
       
       // For local games, show turn transition to prevent card peeking
       if (gameState.gameMode === "local" && winner === null && shouldAdvancePlayer) {
