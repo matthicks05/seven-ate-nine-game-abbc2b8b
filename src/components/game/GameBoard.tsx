@@ -1048,7 +1048,7 @@ const GameBoardContent = () => {
               </div>
               
               {/* Current Sequence Display in Center */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+              <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
                 <div className="bg-accent/90 backdrop-blur-sm rounded-full px-6 py-3 border-2 border-accent shadow-lg">
                   <div className="text-center">
                     <div className="text-sm font-medium text-primary-foreground mb-1">next needed card</div>
