@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { GameZone } from "./GameZone";
 import { GameCard, Card } from "./GameCard";
 import { GameRulesModal } from "./GameRulesModal";
+import { OptionsModal } from "./OptionsModal";
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import ChatPanel from "../chat/ChatPanel";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { useAIPlayers } from "@/hooks/useAIPlayers";
 import { useGameScoring } from "@/hooks/useGameScoring";
 import { useAuth } from "@/components/auth/AuthContext";
 import { Leaderboard } from "@/components/leaderboard/Leaderboard";
-import { MessageCircle, Trophy, LogIn } from "lucide-react";
+import { MessageCircle, Trophy, LogIn, Settings, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -107,6 +108,8 @@ const GameBoardContent = () => {
   
   const [showTurnTransition, setShowTurnTransition] = useState(false);
   const [pendingPlayer, setPendingPlayer] = useState<number | null>(null);
+  const [showRules, setShowRules] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -480,6 +483,28 @@ const GameBoardContent = () => {
                 </div>
               </Button>
             </div>
+            
+            {/* Options and Help buttons */}
+            <div className="flex gap-2 justify-center">
+              <Button 
+                onClick={() => setShowOptions(true)}
+                variant="outline" 
+                size="sm"
+                className="flex-1"
+              >
+                <Settings className="h-4 w-4 mr-1" />
+                Options
+              </Button>
+              <Button 
+                onClick={() => setShowRules(true)}
+                variant="outline" 
+                size="sm"
+                className="flex-1"
+              >
+                <HelpCircle className="h-4 w-4 mr-1" />
+                Rules
+              </Button>
+            </div>
           </div>
 
           {/* Leaderboard overlay */}
@@ -723,7 +748,15 @@ const GameBoardContent = () => {
               
               {/* Mobile: Compact action buttons */}
               <div className="md:hidden flex gap-1">
-                <GameRulesModal />
+                <Button 
+                  onClick={() => setShowRules(true)}
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                  Rules
+                </Button>
                 <PlayerStatsModal 
                   playerHands={gameState.playerHands}
                   currentPlayer={gameState.currentPlayer}
@@ -1017,6 +1050,10 @@ const GameBoardContent = () => {
           </div>
         )}
       </div>
+      
+      {/* Modals */}
+      <GameRulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
+      <OptionsModal isOpen={showOptions} onClose={() => setShowOptions(false)} />
      </div>
    );
  };
