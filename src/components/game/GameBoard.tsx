@@ -83,6 +83,8 @@ interface GameState {
   gameMode: "local" | "online" | "ai" | null;
   roomCode: string | null;
   winner: number | null;
+  waitingForAddyCard: boolean;
+  addyBaseSequence: number | null;
 }
 
 const GameBoardContent = () => {
@@ -96,7 +98,9 @@ const GameBoardContent = () => {
     gamePhase: "modeSelect",
     gameMode: null,
     roomCode: null,
-    winner: null
+    winner: null,
+    waitingForAddyCard: false,
+    addyBaseSequence: null
   });
   
   const [showTurnTransition, setShowTurnTransition] = useState(false);
@@ -147,7 +151,9 @@ const GameBoardContent = () => {
       gamePhase: "playing",
       gameMode: gameState.gameMode,
       roomCode: gameState.roomCode,
-      winner: null
+      winner: null,
+      waitingForAddyCard: false,
+      addyBaseSequence: null
     });
 
     // Initialize AI if in AI mode
@@ -219,17 +225,24 @@ const GameBoardContent = () => {
       return;
     }
 
-    // Basic play logic - check if card can be played
-    const canPlay = card.type === "wild" || 
-                   card.value === gameState.currentSequence ||
-                   card.wildType === "ate"; // Ate can substitute for any number
+    // Check if card can be played
+    let canPlay = false;
+    
+    if (gameState.waitingForAddyCard) {
+      // When waiting for addy card, only allow number cards
+      canPlay = card.type === "number";
+    } else {
+      // Normal play logic
+      canPlay = card.type === "wild" || 
+                card.value === gameState.currentSequence;
+    }
 
     if (!canPlay) {
       console.log("Cannot play this card");
       return;
     }
 
-    // Update game state (simplified for now)
+    // Update game state
     const newPlayerHands = [...gameState.playerHands];
     const cardIndex = newPlayerHands[playerIndex].findIndex(c => c.id === card.id);
     
@@ -237,9 +250,36 @@ const GameBoardContent = () => {
       const playedCard = newPlayerHands[playerIndex].splice(cardIndex, 1)[0];
       const newDiscardPile = [...gameState.discardPile, playedCard];
       
-      // Calculate next sequence number
-      let nextSequence = gameState.currentSequence + 1;
-      if (nextSequence > 9) nextSequence = 1;
+      let nextSequence = gameState.currentSequence;
+      let waitingForAddyCard = false;
+      let addyBaseSequence = null;
+      let shouldAdvancePlayer = true;
+      
+      if (gameState.waitingForAddyCard && card.type === "number") {
+        // Handle addy second card - add to the base sequence
+        nextSequence = (gameState.addyBaseSequence! + card.value!) % 10;
+        if (nextSequence === 0) nextSequence = 10;
+        if (nextSequence > 9) nextSequence = nextSequence - 9;
+        waitingForAddyCard = false;
+        addyBaseSequence = null;
+      } else if (card.type === "wild" && card.wildType === "addy") {
+        // Addy card played - wait for second card
+        waitingForAddyCard = true;
+        addyBaseSequence = gameState.currentSequence;
+        shouldAdvancePlayer = false; // Don't advance player, they get to play another card
+      } else if (card.type === "number") {
+        // Regular number card
+        nextSequence = card.value! + 1;
+        if (nextSequence > 9) nextSequence = 1;
+      } else if (card.type === "wild" && card.wildType === "ate") {
+        // Ate card - keeps current sequence
+        nextSequence = gameState.currentSequence + 1;
+        if (nextSequence > 9) nextSequence = 1;
+      } else {
+        // Other wild cards - advance sequence by 1 for now (can be expanded)
+        nextSequence = gameState.currentSequence + 1;
+        if (nextSequence > 9) nextSequence = 1;
+      }
       
       // Check for win condition
       let winner = null;
@@ -258,10 +298,10 @@ const GameBoardContent = () => {
         }
       }
       
-      const nextPlayer = (gameState.currentPlayer + 1) % gameState.playerCount;
+      const nextPlayer = shouldAdvancePlayer ? (gameState.currentPlayer + 1) % gameState.playerCount : gameState.currentPlayer;
       
       // For local games, show turn transition to prevent card peeking
-      if (gameState.gameMode === "local" && winner === null) {
+      if (gameState.gameMode === "local" && winner === null && shouldAdvancePlayer) {
         setPendingPlayer(nextPlayer);
         setShowTurnTransition(true);
       }
@@ -271,9 +311,11 @@ const GameBoardContent = () => {
         playerHands: newPlayerHands,
         discardPile: newDiscardPile,
         currentSequence: nextSequence,
-        currentPlayer: gameState.gameMode === "local" && winner === null ? gameState.currentPlayer : nextPlayer,
+        currentPlayer: gameState.gameMode === "local" && winner === null && shouldAdvancePlayer ? gameState.currentPlayer : nextPlayer,
         winner,
-        gamePhase: winner !== null ? "finished" : "playing"
+        gamePhase: winner !== null ? "finished" : "playing",
+        waitingForAddyCard,
+        addyBaseSequence
       });
     }
   };
@@ -671,6 +713,15 @@ const GameBoardContent = () => {
             <Button onClick={confirmTurnTransition} size="lg" className="w-full">
               Ready - Start My Turn
             </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Addy Card Status */}
+      {gameState.waitingForAddyCard && (
+        <div className="text-center mb-4">
+          <div className="bg-orange-500 text-white px-4 py-2 rounded-lg inline-block animate-pulse">
+            ✨ Addy Card Active - Play a number card to add to {gameState.addyBaseSequence}!
           </div>
         </div>
       )}
