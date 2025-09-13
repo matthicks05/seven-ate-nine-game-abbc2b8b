@@ -9,8 +9,14 @@ interface OptionsModalProps {
 }
 
 export const OptionsModal: React.FC<OptionsModalProps> = ({ isOpen, onClose }) => {
-  console.log('OptionsModal render - isOpen:', isOpen);
+  console.log('OptionsModal render - isOpen:', isOpen, 'typeof isOpen:', typeof isOpen);
   
+  if (!isOpen) {
+    console.log('OptionsModal not rendering because isOpen is false');
+    return null;
+  }
+  
+  console.log('OptionsModal rendering with isOpen true');
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md z-[9999] bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 shadow-2xl fixed inset-0 m-auto h-fit">
