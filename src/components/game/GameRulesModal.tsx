@@ -45,7 +45,7 @@ export const GameRulesModal = ({ isOpen, onClose }: GameRulesModalProps) => {
                 <span className="text-muted-foreground">Give half your cards to next player</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">3🇬🇧 (British 3)</span>
+                <span className="font-medium">🇬🇧 Cup of Three</span>
                 <span className="text-muted-foreground">All players draw one card</span>
               </div>
               <div className="flex justify-between">

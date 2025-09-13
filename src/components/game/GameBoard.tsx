@@ -862,7 +862,7 @@ const GameBoardContent = () => {
                   <p className="text-muted-foreground">Give half your remaining cards to the next player</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🇬🇧 British 3</h4>
+                  <h4 className="font-medium text-accent mb-2">🇬🇧 Cup of Three</h4>
                   <p className="text-muted-foreground">All players draw one card</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
