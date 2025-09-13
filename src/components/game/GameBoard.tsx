@@ -1221,7 +1221,7 @@ const GameBoardContent = () => {
                 cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
                 cardSize="md"
                 layout="fan"
-                className="scale-75 transform rotate-45"
+                className="scale-75 transform rotate-[135deg]"
               />
             </div>
           </div>
