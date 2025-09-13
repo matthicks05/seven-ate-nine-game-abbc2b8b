@@ -968,150 +968,203 @@ const GameBoardContent = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div className="hidden md:block max-w-7xl mx-auto relative">
         
-        {/* Left - Deck and Discard */}
-        <div className="space-y-4">
-          <GameZone
-            title={`Draw Pile (${gameState.deck.length})`}
-            cards={gameState.deck.length > 0 ? [{ ...gameState.deck[gameState.deck.length - 1], isVisible: false }] : []}
-            layout="stack"
-            onCardClick={handleDrawCard}
-            className="bg-muted/30"
-          />
+        {/* Background - Other Players' Cards */}
+        <div className="absolute inset-0 -z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 opacity-30 blur-sm">
+            {gameState.gameMode === "ai" ? (
+              // AI Mode: Show AI players in background
+              gameState.playerHands.slice(1).map((hand, index) => {
+                const aiIndex = index + 1;
+                const hiddenCards = hand.map((card, cardIndex) => ({
+                  ...card,
+                  id: `bg-ai-${aiIndex}-${cardIndex}`,
+                  isVisible: false
+                }));
+                
+                return (
+                  <div key={aiIndex} className="transform rotate-12 scale-75">
+                    <GameZone
+                      title={`AI ${aiIndex} (${hand.length})`}
+                      cards={hiddenCards}
+                      layout="fan"
+                      className="bg-muted/10"
+                      cardSize="sm"
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              // Local/Online Mode: Show other players in background
+              gameState.playerHands.map((hand, index) => {
+                if (index === gameState.currentPlayer) return null;
+                
+                const hiddenCards = hand.map((card, cardIndex) => ({
+                  ...card,
+                  id: `bg-${index}-${cardIndex}`,
+                  isVisible: false
+                }));
+                
+                return (
+                  <div key={index} className="transform -rotate-6 scale-75">
+                    <GameZone
+                      title={`P${index + 1} (${hand.length})`}
+                      cards={hiddenCards}
+                      layout="fan"
+                      className="bg-muted/10"
+                      cardSize="sm"
+                    />
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Main Game Area */}
+        <div className="relative z-10 grid grid-cols-5 gap-6 items-center min-h-[70vh]">
           
-          <GameZone
-            title="Discard Pile"
-            cards={gameState.discardPile}
-            layout="stack"
-            className="bg-card/50"
-          />
-        </div>
-
-        {/* Center - Sequence Indicator */}
-        <div className="flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <h2 className="text-xl font-semibold">Next Card Needed</h2>
-            <div className="w-24 h-32 bg-gradient-primary rounded-lg flex items-center justify-center border-4 border-primary-glow">
-              <span className="text-4xl font-bold text-primary-foreground">{gameState.currentSequence}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Sequence: 1→2→3→4→5→6→7→8→9→1
-            </p>
+          {/* Left - Deck */}
+          <div className="justify-self-start">
+            <GameZone
+              title={`Draw (${gameState.deck.length})`}
+              cards={gameState.deck.length > 0 ? [{ ...gameState.deck[gameState.deck.length - 1], isVisible: false }] : []}
+              layout="stack"
+              onCardClick={handleDrawCard}
+              className="bg-muted/30 hover:bg-muted/50 transition-colors"
+            />
           </div>
-        </div>
 
-        {/* Right - Game Stats (Desktop Only) */}
-        <div className="space-y-4">
-          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-card-border">
-            <h3 className="text-lg font-semibold mb-4 text-center">Players</h3>
-            <div className="space-y-2">
-              {gameState.playerHands.map((hand, index) => (
-                <div key={index} className={cn(
-                  "flex justify-between items-center p-2 rounded",
-                  index === gameState.currentPlayer ? "bg-primary/10 border border-primary/20" : "bg-muted/20"
-                )}>
-                  <span className={cn(
-                    "font-medium",
-                    index === gameState.currentPlayer && "text-primary"
+          {/* Left Center - Discard */}
+          <div className="justify-self-center">
+            <GameZone
+              title="Discard"
+              cards={gameState.discardPile}
+              layout="stack"
+              className="bg-card/50"
+            />
+          </div>
+
+          {/* Center - Current Player's Hand (LARGE) */}
+          <div className="justify-self-center">
+            <div className="animate-fade-in">
+              <GameZone
+                title={gameState.gameMode === "ai" ? "Your Hand" : `Your Hand (Player ${gameState.currentPlayer + 1})`}
+                cards={gameState.gameMode === "ai" ? 
+                  (gameState.playerHands[0] || []) : 
+                  (gameState.playerHands[gameState.currentPlayer] || [])
+                }
+                layout="fan"
+                onCardClick={(card) => handleCardPlay(card, gameState.gameMode === "ai" ? 0 : gameState.currentPlayer)}
+                className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm border-2 border-primary/40 shadow-2xl"
+                cardSize="lg"
+              />
+            </div>
+          </div>
+
+          {/* Right Center - Sequence Indicator */}
+          <div className="justify-self-center">
+            <div className="text-center space-y-4 animate-scale-in">
+              <h2 className="text-lg font-semibold">Next Card</h2>
+              <div className="w-20 h-28 bg-gradient-primary rounded-lg flex items-center justify-center border-3 border-primary-glow shadow-lg">
+                <span className="text-3xl font-bold text-primary-foreground">{gameState.currentSequence}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right - Game Stats */}
+          <div className="justify-self-end">
+            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-card-border space-y-3">
+              <h3 className="text-sm font-semibold text-center">Players</h3>
+              <div className="space-y-1">
+                {gameState.playerHands.map((hand, index) => (
+                  <div key={index} className={cn(
+                    "flex justify-between items-center p-1 rounded text-xs",
+                    (gameState.gameMode === "ai" ? index === 0 : index === gameState.currentPlayer) ? "bg-primary/10 border border-primary/20" : "bg-muted/20"
                   )}>
-                    {gameState.gameMode === "ai" && index > 0 ? `AI Player ${index}` : `Player ${index + 1}`}
-                    {aiThinking[index] && gameState.gameMode === "ai" && " (thinking...)"}
-                  </span>
-                  <span className="text-sm">{hand.length} cards</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-card-border">
-            <h3 className="text-lg font-semibold mb-4 text-center">Wild Cards</h3>
-            <div className="grid grid-cols-2 gap-1 text-xs">
-              <div>ATE - Any number</div>
-              <div>ADD - Add & sum</div>
-              <div>÷ - Give half cards</div>
-              <div>3🇬🇧 - All draw 1</div>
-              <div>π - Discard 1-4s</div>
-              <div>NU-UH - Cancel/Skip</div>
-              <div>🍽️ - Discard 2</div>
-              <div>-1 - Play 3 lower</div>
-              <div>2👋 - 2 players draw 2</div>
+                    <span className={cn(
+                      "font-medium",
+                      (gameState.gameMode === "ai" ? index === 0 : index === gameState.currentPlayer) && "text-primary"
+                    )}>
+                      {gameState.gameMode === "ai" && index > 0 ? `AI ${index}` : 
+                       gameState.gameMode === "ai" && index === 0 ? "You" : `P${index + 1}`}
+                      {aiThinking[index] && gameState.gameMode === "ai" && " 🤔"}
+                    </span>
+                    <span className="text-xs">{hand.length}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-          {/* Player Hands - Show based on game mode */}
-          <div className="mt-4 md:mt-8 space-y-4">
+      {/* Mobile Layout - Compact */}
+      <div className="md:hidden space-y-4">
+        {/* Current Player's Hand - Large and Centered */}
+        <div className="px-4">
+          <GameZone
+            title={gameState.gameMode === "ai" ? "Your Hand" : `Your Hand (Player ${gameState.currentPlayer + 1})`}
+            cards={gameState.gameMode === "ai" ? 
+              (gameState.playerHands[0] || []) : 
+              (gameState.playerHands[gameState.currentPlayer] || [])
+            }
+            layout="fan"
+            onCardClick={(card) => handleCardPlay(card, gameState.gameMode === "ai" ? 0 : gameState.currentPlayer)}
+            className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm border-2 border-primary/30"
+            cardSize="md"
+          />
+        </div>
+
+        {/* Other Players - Compact Background */}
+        <div className="px-4">
+          <div className="grid grid-cols-2 gap-2 opacity-60">
             {gameState.gameMode === "ai" ? (
-              // AI Mode: Only show human player's hand (Player 1)
-              <>
-                <GameZone
-                  title="Your Hand (Player 1)"
-                  cards={gameState.playerHands[0] || []}
-                  layout="fan"
-                  onCardClick={(card) => handleCardPlay(card, 0)}
-                  className="bg-card/30 backdrop-blur-sm border border-primary/20"
-                  cardSize="md"
-                />
+              gameState.playerHands.slice(1).map((hand, index) => {
+                const aiIndex = index + 1;
+                const hiddenCards = hand.map((card, cardIndex) => ({
+                  ...card,
+                  id: `mobile-ai-${aiIndex}-${cardIndex}`,
+                  isVisible: false
+                }));
                 
-                {/* AI Players' Hands - Always hidden */}
-                {gameState.playerHands.slice(1).map((hand, index) => {
-                  const aiIndex = index + 1;
-                  const hiddenCards = hand.map((card, cardIndex) => ({
-                    ...card,
-                    id: `hidden-ai-${aiIndex}-${cardIndex}`,
-                    isVisible: false
-                  }));
-                  
-                  return (
-                    <GameZone
-                      key={aiIndex}
-                      title={`AI Player ${aiIndex} (${hand.length} cards)${aiThinking[aiIndex] ? " (thinking...)" : ""}`}
-                      cards={hiddenCards}
-                      layout="fan"
-                      className="bg-muted/20 opacity-60"
-                      cardSize="sm"
-                    />
-                  );
-                })}
-              </>
+                return (
+                  <GameZone
+                    key={aiIndex}
+                    title={`AI ${aiIndex} (${hand.length})`}
+                    cards={hiddenCards}
+                    layout="stack"
+                    className="bg-muted/20"
+                    cardSize="sm"
+                  />
+                );
+              })
             ) : (
-              // Local/Online Mode: Show current player's cards
-              <>
-                <GameZone
-                  title={`Your Hand (Player ${gameState.currentPlayer + 1})`}
-                  cards={gameState.playerHands[gameState.currentPlayer] || []}
-                  layout="fan"
-                  onCardClick={(card) => handleCardPlay(card, gameState.currentPlayer)}
-                  className="bg-card/30 backdrop-blur-sm border border-primary/20"
-                  cardSize="md"
-                />
+              gameState.playerHands.map((hand, index) => {
+                if (index === gameState.currentPlayer) return null;
                 
-                {/* Other Players' Hands - Show only card count and back of cards */}
-                {gameState.playerHands.map((hand, index) => {
-                  if (index === gameState.currentPlayer) return null;
-                  
-                  const hiddenCards = hand.map((card, cardIndex) => ({
-                    ...card,
-                    id: `hidden-${index}-${cardIndex}`,
-                    isVisible: false
-                  }));
-                  
-                  return (
-                    <GameZone
-                      key={index}
-                      title={`Player ${index + 1} (${hand.length} cards)`}
-                      cards={hiddenCards}
-                      layout="fan"
-                      className="bg-muted/20 opacity-60"
-                      cardSize="sm"
-                    />
-                  );
-                })}
-              </>
+                const hiddenCards = hand.map((card, cardIndex) => ({
+                  ...card,
+                  id: `mobile-${index}-${cardIndex}`,
+                  isVisible: false
+                }));
+                
+                return (
+                  <GameZone
+                    key={index}
+                    title={`Player ${index + 1} (${hand.length})`}
+                    cards={hiddenCards}
+                    layout="stack"
+                    className="bg-muted/20"
+                    cardSize="sm"
+                  />
+                );
+              })
             )}
           </div>
+        </div>
+      </div>
         </div>
 
         {/* Chat Panel - Desktop */}
