@@ -726,10 +726,29 @@ const GameBoardContent = () => {
         </div>
       )}
 
-      {/* Mobile: Current player indicator */}
-      <div className="md:hidden text-center mb-4">
-        <div className="bg-primary px-4 py-2 rounded-full text-primary-foreground inline-block">
-          Player {gameState.currentPlayer + 1}'s Turn
+      {/* Current Player Turn Indicator - Prominent for all screen sizes */}
+      <div className="text-center mb-6">
+        <div className="relative">
+          {/* Main turn indicator */}
+          <div className="bg-gradient-to-r from-primary to-primary-glow px-8 py-4 rounded-2xl text-primary-foreground inline-block shadow-2xl animate-pulse border-4 border-primary-glow/50">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-primary-foreground rounded-full animate-bounce"></div>
+              <span className="text-xl md:text-2xl font-bold">
+                {gameState.gameMode === "ai" && gameState.currentPlayer > 0 
+                  ? `AI Player ${gameState.currentPlayer}'s Turn` 
+                  : gameState.gameMode === "ai" && gameState.currentPlayer === 0
+                  ? "Your Turn!"
+                  : `Player ${gameState.currentPlayer + 1}'s Turn`}
+              </span>
+              <div className="w-3 h-3 bg-primary-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            </div>
+            {gameState.gameMode === "ai" && aiThinking[gameState.currentPlayer] && (
+              <div className="text-sm mt-1 opacity-90">AI is thinking...</div>
+            )}
+          </div>
+          
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-glow rounded-2xl blur-xl opacity-30 animate-pulse -z-10"></div>
         </div>
       </div>
 
