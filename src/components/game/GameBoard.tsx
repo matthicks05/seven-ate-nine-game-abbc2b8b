@@ -967,200 +967,201 @@ const GameBoardContent = () => {
         </div>
       </div>
 
-      {/* Desktop Layout */}
-      <div className="hidden md:block max-w-7xl mx-auto relative">
+      {/* Desktop Layout - UNO Style */}
+      <div className="hidden md:flex min-h-screen relative overflow-hidden">
         
-        {/* Background - Other Players' Cards */}
-        <div className="absolute inset-0 -z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 opacity-30 blur-sm">
-            {gameState.gameMode === "ai" ? (
-              // AI Mode: Show AI players in background
-              gameState.playerHands.slice(1).map((hand, index) => {
-                const aiIndex = index + 1;
-                const hiddenCards = hand.map((card, cardIndex) => ({
-                  ...card,
-                  id: `bg-ai-${aiIndex}-${cardIndex}`,
-                  isVisible: false
-                }));
-                
-                return (
-                  <div key={aiIndex} className="transform rotate-12 scale-75">
-                    <GameZone
-                      title={`AI ${aiIndex} (${hand.length})`}
-                      cards={hiddenCards}
-                      layout="fan"
-                      className="bg-muted/10"
-                      cardSize="sm"
-                    />
-                  </div>
-                );
-              })
-            ) : (
-              // Local/Online Mode: Show other players in background
-              gameState.playerHands.map((hand, index) => {
-                if (index === gameState.currentPlayer) return null;
-                
-                const hiddenCards = hand.map((card, cardIndex) => ({
-                  ...card,
-                  id: `bg-${index}-${cardIndex}`,
-                  isVisible: false
-                }));
-                
-                return (
-                  <div key={index} className="transform -rotate-6 scale-75">
-                    <GameZone
-                      title={`P${index + 1} (${hand.length})`}
-                      cards={hiddenCards}
-                      layout="fan"
-                      className="bg-muted/10"
-                      cardSize="sm"
-                    />
-                  </div>
-                );
-              })
-            )}
+        {/* Opponent Players positioned around the table */}
+        
+        {/* Top Player */}
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="rotate-180 opacity-60 hover:opacity-80 transition-opacity">
+            <GameZone
+              title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
+              cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `p2-${index}`, isVisible: false })) || []}
+              cardSize="sm"
+              layout="fan"
+              className="scale-75"
+            />
+          </div>
+        </div>
+        
+        {/* Left Player */}
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 -rotate-90 z-10">
+          <div className="opacity-60 hover:opacity-80 transition-opacity">
+            <GameZone
+              title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
+              cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
+              cardSize="sm"
+              layout="fan"
+              className="scale-75"
+            />
+          </div>
+        </div>
+        
+        {/* Right Player */}
+        <div className="absolute right-8 top-1/2 transform -translate-y-1/2 rotate-90 z-10">
+          <div className="opacity-60 hover:opacity-80 transition-opacity">
+            <GameZone
+              title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
+              cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
+              cardSize="sm"
+              layout="fan"
+              className="scale-75"
+            />
           </div>
         </div>
 
-        {/* Main Game Area */}
-        <div className="relative z-10 grid grid-cols-5 gap-6 items-center min-h-[70vh]">
+        {/* Main Game Table Area */}
+        <div className="flex-1 flex flex-col">
           
-          {/* Left - Deck */}
-          <div className="justify-self-start">
-            <GameZone
-              title={`Draw (${gameState.deck.length})`}
-              cards={gameState.deck.length > 0 ? [{ ...gameState.deck[gameState.deck.length - 1], isVisible: false }] : []}
-              layout="stack"
-              onCardClick={handleDrawCard}
-              className="bg-muted/30 hover:bg-muted/50 transition-colors"
-            />
-          </div>
-
-          {/* Left Center - Discard */}
-          <div className="justify-self-center">
-            <GameZone
-              title="Discard"
-              cards={gameState.discardPile}
-              layout="stack"
-              className="bg-card/50"
-            />
-          </div>
-
-          {/* Center - Current Player's Hand (LARGE) */}
-          <div className="justify-self-center">
-            <div className="animate-fade-in">
-              <GameZone
-                title={gameState.gameMode === "ai" ? "Your Hand" : `Your Hand (Player ${gameState.currentPlayer + 1})`}
-                cards={gameState.gameMode === "ai" ? 
-                  (gameState.playerHands[0] || []) : 
-                  (gameState.playerHands[gameState.currentPlayer] || [])
-                }
-                layout="fan"
-                onCardClick={(card) => handleCardPlay(card, gameState.gameMode === "ai" ? 0 : gameState.currentPlayer)}
-                className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm border-2 border-primary/40 shadow-2xl"
-                cardSize="lg"
-              />
-            </div>
-          </div>
-
-          {/* Right Center - Sequence Indicator */}
-          <div className="justify-self-center">
-            <div className="text-center space-y-4 animate-scale-in">
-              <h2 className="text-lg font-semibold">Next Card</h2>
-              <div className="w-20 h-28 bg-gradient-primary rounded-lg flex items-center justify-center border-3 border-primary-glow shadow-lg">
-                <span className="text-3xl font-bold text-primary-foreground">{gameState.currentSequence}</span>
+          {/* Center Table - Draw/Discard Piles */}
+          <div className="flex-1 flex items-center justify-center relative">
+            {/* Game Table Surface */}
+            <div className="bg-gradient-radial from-background/90 to-background/60 rounded-full w-96 h-96 flex items-center justify-center relative border-4 border-primary/20 shadow-2xl">
+              
+              {/* Center Card Piles */}
+              <div className="flex gap-8 items-center">
+                {/* Draw Pile */}
+                <div 
+                  onClick={handleDrawCard} 
+                  className="cursor-pointer hover:scale-110 transition-all duration-200 hover:rotate-3"
+                >
+                  <GameZone
+                    title={`DRAW (${gameState.deck.length})`}
+                    cards={gameState.deck.length > 0 ? [{ ...gameState.deck[gameState.deck.length - 1], isVisible: false }] : []}
+                    cardSize="lg"
+                    layout="stack"
+                    className="bg-primary/10 rounded-xl border-2 border-primary/30 shadow-lg"
+                  />
+                </div>
+                
+                {/* Discard Pile */}
+                <div className="relative">
+                  <GameZone
+                    title="DISCARD"
+                    cards={gameState.discardPile.slice(-1)}
+                    cardSize="lg"
+                    layout="stack"
+                    className="bg-accent/10 rounded-xl border-2 border-accent/30 shadow-lg"
+                  />
+                </div>
+              </div>
+              
+              {/* Current Sequence Display in Center */}
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-accent/20 rounded-full px-6 py-3 border-2 border-accent/40 backdrop-blur-sm">
+                  <span className="text-2xl font-bold text-accent-foreground">
+                    Next: {gameState.currentSequence}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right - Game Stats */}
-          <div className="justify-self-end">
-            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-card-border space-y-3">
-              <h3 className="text-sm font-semibold text-center">Players</h3>
-              <div className="space-y-1">
-                {gameState.playerHands.map((hand, index) => (
-                  <div key={index} className={cn(
-                    "flex justify-between items-center p-1 rounded text-xs",
-                    (gameState.gameMode === "ai" ? index === 0 : index === gameState.currentPlayer) ? "bg-primary/10 border border-primary/20" : "bg-muted/20"
-                  )}>
-                    <span className={cn(
-                      "font-medium",
-                      (gameState.gameMode === "ai" ? index === 0 : index === gameState.currentPlayer) && "text-primary"
-                    )}>
-                      {gameState.gameMode === "ai" && index > 0 ? `AI ${index}` : 
-                       gameState.gameMode === "ai" && index === 0 ? "You" : `P${index + 1}`}
-                      {aiThinking[index] && gameState.gameMode === "ai" && " 🤔"}
-                    </span>
-                    <span className="text-xs">{hand.length}</span>
-                  </div>
-                ))}
+          {/* Bottom Player Area - Current Player's Hand */}
+          <div className="p-8 z-20">
+            <div className="relative">
+              {/* Curved UNO-style hand background */}
+              <div className="bg-gradient-to-t from-primary/25 to-primary/10 rounded-t-[4rem] p-8 border-t-4 border-primary/40 shadow-2xl backdrop-blur-sm">
+                <GameZone
+                  title={gameState.gameMode === "ai" ? 
+                    (gameState.currentPlayer === 0 ? "YOUR TURN!" : "Your Hand") :
+                    (gameState.currentPlayer === 0 ? "YOUR TURN!" : `Player ${gameState.currentPlayer + 1}'s Hand`)
+                  }
+                  cards={gameState.gameMode === "ai" ? 
+                    (gameState.playerHands[0] || []) : 
+                    (gameState.playerHands[gameState.currentPlayer] || [])
+                  }
+                  onCardClick={(card) => handleCardPlay(card, gameState.gameMode === "ai" ? 0 : gameState.currentPlayer)}
+                  cardSize="lg"
+                  layout="fan"
+                  isActive={gameState.gameMode === "ai" ? gameState.currentPlayer === 0 : true}
+                  className="transform translate-y-2"
+                />
               </div>
+              
+              {/* Active player glow effect */}
+              {((gameState.gameMode === "ai" && gameState.currentPlayer === 0) || gameState.gameMode !== "ai") && (
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent rounded-t-[4rem] animate-pulse pointer-events-none" />
+              )}
             </div>
           </div>
-        </div>
+         </div>
       </div>
 
-      {/* Mobile Layout - Compact */}
-      <div className="md:hidden space-y-4">
-        {/* Current Player's Hand - Large and Centered */}
-        <div className="px-4">
+      {/* Mobile Layout - UNO Style */}
+      <div className="md:hidden flex flex-col min-h-screen relative overflow-hidden">
+        {/* Top Opponent */}
+        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 rotate-180 opacity-50 scale-75 z-10">
           <GameZone
-            title={gameState.gameMode === "ai" ? "Your Hand" : `Your Hand (Player ${gameState.currentPlayer + 1})`}
-            cards={gameState.gameMode === "ai" ? 
-              (gameState.playerHands[0] || []) : 
-              (gameState.playerHands[gameState.currentPlayer] || [])
-            }
+            title={gameState.gameMode === "ai" ? "AI Player" : "Opponent"}
+            cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `mobile-p2-${index}`, isVisible: false })).slice(0, 3) || []}
+            cardSize="sm"
             layout="fan"
-            onCardClick={(card) => handleCardPlay(card, gameState.gameMode === "ai" ? 0 : gameState.currentPlayer)}
-            className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm border-2 border-primary/30"
-            cardSize="md"
+          />
+        </div>
+        
+        {/* Side Opponents */}
+        <div className="absolute left-2 top-1/3 -rotate-90 opacity-40 scale-50 z-10">
+          <GameZone
+            title="Player"
+            cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `mobile-p3-${index}`, isVisible: false })).slice(0, 2) || []}
+            cardSize="sm"
+            layout="fan"
+          />
+        </div>
+        <div className="absolute right-2 top-1/3 rotate-90 opacity-40 scale-50 z-10">
+          <GameZone
+            title="Player"
+            cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `mobile-p4-${index}`, isVisible: false })).slice(0, 2) || []}
+            cardSize="sm"
+            layout="fan"
           />
         </div>
 
-        {/* Other Players - Compact Background */}
-        <div className="px-4">
-          <div className="grid grid-cols-2 gap-2 opacity-60">
-            {gameState.gameMode === "ai" ? (
-              gameState.playerHands.slice(1).map((hand, index) => {
-                const aiIndex = index + 1;
-                const hiddenCards = hand.map((card, cardIndex) => ({
-                  ...card,
-                  id: `mobile-ai-${aiIndex}-${cardIndex}`,
-                  isVisible: false
-                }));
-                
-                return (
-                  <GameZone
-                    key={aiIndex}
-                    title={`AI ${aiIndex} (${hand.length})`}
-                    cards={hiddenCards}
-                    layout="stack"
-                    className="bg-muted/20"
-                    cardSize="sm"
-                  />
-                );
-              })
-            ) : (
-              gameState.playerHands.map((hand, index) => {
-                if (index === gameState.currentPlayer) return null;
-                
-                const hiddenCards = hand.map((card, cardIndex) => ({
-                  ...card,
-                  id: `mobile-${index}-${cardIndex}`,
-                  isVisible: false
-                }));
-                
-                return (
-                  <GameZone
-                    key={index}
-                    title={`Player ${index + 1} (${hand.length})`}
-                    cards={hiddenCards}
-                    layout="stack"
-                    className="bg-muted/20"
-                    cardSize="sm"
-                  />
-                );
-              })
+        {/* Center Game Table */}
+        <div className="flex-1 flex items-center justify-center z-20 mt-20 mb-20">
+          <div className="bg-gradient-radial from-background/90 to-background/60 rounded-full p-8 border-2 border-primary/20">
+            <div className="flex gap-4">
+              <div onClick={handleDrawCard} className="cursor-pointer hover:scale-105 transition-transform">
+                <GameZone
+                  title={`DRAW (${gameState.deck.length})`}
+                  cards={gameState.deck.length > 0 ? [{ ...gameState.deck[gameState.deck.length - 1], isVisible: false }] : []}
+                  cardSize="lg"
+                  layout="stack"
+                  className="bg-primary/10 rounded-lg border border-primary/30"
+                />
+              </div>
+              <GameZone
+                title="DISCARD"
+                cards={gameState.discardPile.slice(-1)}
+                cardSize="lg"
+                layout="stack"
+                className="bg-accent/10 rounded-lg border border-accent/30"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Player Hand - Curved UNO Style */}
+        <div className="z-20">
+          <div className="bg-gradient-to-t from-primary/25 to-primary/10 rounded-t-[2rem] p-6 border-t-2 border-primary/40 shadow-xl">
+            <GameZone
+              title={gameState.gameMode === "ai" ?
+                (gameState.currentPlayer === 0 ? "YOUR TURN!" : "Your Hand") :
+                (gameState.currentPlayer === 0 ? "YOUR TURN!" : `Player ${gameState.currentPlayer + 1}'s Hand`)
+              }
+              cards={gameState.gameMode === "ai" ? 
+                (gameState.playerHands[0] || []) : 
+                (gameState.playerHands[gameState.currentPlayer] || [])
+              }
+              onCardClick={(card) => handleCardPlay(card, gameState.gameMode === "ai" ? 0 : gameState.currentPlayer)}
+              cardSize="lg"
+              layout="fan"
+              isActive={gameState.gameMode === "ai" ? gameState.currentPlayer === 0 : true}
+            />
+            {((gameState.gameMode === "ai" && gameState.currentPlayer === 0) || gameState.gameMode !== "ai") && (
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent rounded-t-[2rem] animate-pulse pointer-events-none" />
             )}
           </div>
         </div>
