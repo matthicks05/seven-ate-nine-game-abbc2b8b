@@ -986,7 +986,7 @@ const GameBoardContent = () => {
         </div>
         
         {/* Left Player - Positioned outward from center table */}
-        <div className="absolute left-1/2 top-1/3 transform -translate-x-[375px] -translate-y-1/2 -rotate-90 z-10">
+        <div className="absolute left-1/2 top-1/3 transform -translate-x-[390px] -translate-y-1/2 -rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
@@ -999,7 +999,7 @@ const GameBoardContent = () => {
         </div>
         
         {/* Right Player - Positioned outward from center table */}
-        <div className="absolute right-1/2 top-1/3 transform translate-x-[375px] -translate-y-1/2 rotate-90 z-10">
+        <div className="absolute right-1/2 top-1/3 transform translate-x-[390px] -translate-y-1/2 rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
