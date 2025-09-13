@@ -978,9 +978,9 @@ const GameBoardContent = () => {
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
               cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `p2-${index}`, isVisible: false })) || []}
-              cardSize="lg"
+              cardSize="md"
               layout="fan"
-              className="scale-90"
+              className="scale-75"
             />
           </div>
         </div>
@@ -991,9 +991,9 @@ const GameBoardContent = () => {
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
               cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
-              cardSize="lg"
+              cardSize="md"
               layout="fan"
-              className="scale-90"
+              className="scale-75"
             />
           </div>
         </div>
@@ -1004,9 +1004,9 @@ const GameBoardContent = () => {
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
               cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
-              cardSize="lg"
+              cardSize="md"
               layout="fan"
-              className="scale-90"
+              className="scale-75"
             />
           </div>
         </div>
