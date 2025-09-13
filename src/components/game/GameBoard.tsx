@@ -1214,7 +1214,7 @@ const GameBoardContent = () => {
 
         {/* Fifth Player - Top Right for 5-player mode */}
         {gameState.playerCount === 5 && (
-          <div className={`absolute top-8 z-10 ${gameState.playerCount === 5 ? 'right-1/2 transform translate-x-32' : 'right-1/2 transform translate-x-32'}`}>
+          <div className="absolute top-8 right-1/2 transform translate-x-1/2 z-10">
             <div className="opacity-80 hover:opacity-100 transition-opacity">
               <GameZone
                 title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
