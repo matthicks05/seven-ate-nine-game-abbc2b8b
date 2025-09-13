@@ -1214,7 +1214,7 @@ const GameBoardContent = () => {
 
         {/* Fifth Player - Top Right for 5-player mode */}
         {gameState.playerCount === 5 && (
-          <div className="absolute top-8 right-1/2 transform translate-x-1/2 z-10">
+          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
             <div className="opacity-80 hover:opacity-100 transition-opacity">
               <GameZone
                 title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
@@ -1223,7 +1223,7 @@ const GameBoardContent = () => {
                 layout="fan"
                 className={`scale-75 transition-all duration-300 ${
                   gameState.playerCount === 5 
-                    ? "transform rotate-[45deg] translate-x-40 translate-y-12 scale-y-[-1]" 
+                    ? "transform -rotate-[35deg] -translate-x-40 translate-y-12" 
                     : "transform -rotate-45"
                 }`}
               />
