@@ -8,7 +8,7 @@ export interface GameState {
   currentSequence: number;
   currentPlayer: number;
   playerCount: number;
-  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished";
+  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished" | "options";
   gameMode: "local" | "online" | "ai" | null;
   roomCode: string | null;
   winner: number | null;

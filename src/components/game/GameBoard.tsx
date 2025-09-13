@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { GameZone } from "./GameZone";
 import { GameCard, Card } from "./GameCard";
 import { GameRulesModal } from "./GameRulesModal";
-import { OptionsModal } from "./OptionsModal";
+
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import ChatPanel from "../chat/ChatPanel";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useAIPlayers } from "@/hooks/useAIPlayers";
 import { useGameScoring } from "@/hooks/useGameScoring";
 import { useAuth } from "@/components/auth/AuthContext";
 import { Leaderboard } from "@/components/leaderboard/Leaderboard";
-import { MessageCircle, Trophy, LogIn, Settings, HelpCircle } from "lucide-react";
+import { MessageCircle, Trophy, LogIn, Settings, HelpCircle, Palette } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -80,7 +80,7 @@ interface GameState {
   currentSequence: number;
   currentPlayer: number;
   playerCount: number;
-  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished";
+  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished" | "options";
   gameMode: "local" | "online" | "ai" | null;
   roomCode: string | null;
   winner: number | null;
@@ -109,8 +109,6 @@ const GameBoardContent = () => {
   const [showTurnTransition, setShowTurnTransition] = useState(false);
   const [pendingPlayer, setPendingPlayer] = useState<number | null>(null);
   const [showRules, setShowRules] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  console.log('GameBoard showOptions state:', showOptions);
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -490,7 +488,10 @@ const GameBoardContent = () => {
               <Button 
                 onClick={() => {
                   console.log('Options button clicked');
-                  setShowOptions(true);
+                  setGameState(prev => ({
+                    ...prev,
+                    gamePhase: "options"
+                  }));
                 }}
                 variant="outline" 
                 size="sm"
@@ -640,6 +641,42 @@ const GameBoardContent = () => {
               </Button>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState.gamePhase === "options") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-8 max-w-md">
+          <div className="space-y-4">
+            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Game Options
+            </h1>
+            <p className="text-muted-foreground">
+              Customize your game experience
+            </p>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="bg-card/30 backdrop-blur-sm border border-primary/20 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Color Theme
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Theme selection coming soon! Currently using the default theme.
+              </p>
+            </div>
+          </div>
+          
+          <Button
+            onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))}
+            className="w-full"
+          >
+            Back to Main Menu
+          </Button>
         </div>
       </div>
     );
@@ -1057,7 +1094,6 @@ const GameBoardContent = () => {
       
       {/* Modals */}
       <GameRulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
-      <OptionsModal isOpen={showOptions} onClose={() => setShowOptions(false)} />
      </div>
    );
  };
