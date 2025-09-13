@@ -974,7 +974,7 @@ const GameBoardContent = () => {
         
         {/* Top Player - Centered above table */}
         <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="rotate-180 opacity-80 hover:opacity-100 transition-opacity">
+          <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
               cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `p2-${index}`, isVisible: false })) || []}
