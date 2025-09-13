@@ -1178,7 +1178,11 @@ const GameBoardContent = () => {
               cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
               cardSize="md"
               layout="fan"
-              className="scale-75"
+              className={`scale-75 transition-all duration-300 ${
+                gameState.playerCount === 5 
+                  ? "transform -rotate-45 -translate-x-32" 
+                  : ""
+              }`}
             />
           </div>
         </div>
@@ -1206,7 +1210,22 @@ const GameBoardContent = () => {
               layout="fan"
               className="scale-75"
             />
+        </div>
+
+        {/* Fifth Player - Top Right for 5-player mode */}
+        {gameState.playerCount === 5 && (
+          <div className="absolute top-8 right-1/2 transform translate-x-32 z-10">
+            <div className="opacity-80 hover:opacity-100 transition-opacity">
+              <GameZone
+                title={gameState.gameMode === "ai" ? `AI Player 5 (${gameState.playerHands[4]?.length || 0})` : `Player 5 (${gameState.playerHands[4]?.length || 0})`}
+                cards={gameState.playerHands[4]?.map((card, index) => ({ ...card, id: `p5-${index}`, isVisible: false })) || []}
+                cardSize="md"
+                layout="fan"
+                className="scale-75 transform rotate-45"
+              />
+            </div>
           </div>
+        )}
         </div>
 
         {/* Main Game Table Area */}
