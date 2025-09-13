@@ -85,6 +85,7 @@ interface GameState {
   winner: number | null;
   waitingForAddyCard: boolean;
   addyBaseSequence: number | null;
+  aiDifficulty: 'easy' | 'medium' | 'hard' | 'expert';
 }
 
 const GameBoardContent = () => {
@@ -100,7 +101,8 @@ const GameBoardContent = () => {
     roomCode: null,
     winner: null,
     waitingForAddyCard: false,
-    addyBaseSequence: null
+    addyBaseSequence: null,
+    aiDifficulty: 'medium'
   });
   
   const [showTurnTransition, setShowTurnTransition] = useState(false);
@@ -153,7 +155,8 @@ const GameBoardContent = () => {
       roomCode: gameState.roomCode,
       winner: null,
       waitingForAddyCard: false,
-      addyBaseSequence: null
+      addyBaseSequence: null,
+      aiDifficulty: gameState.aiDifficulty
     });
 
     // Initialize AI if in AI mode
@@ -595,7 +598,7 @@ const GameBoardContent = () => {
   if (gameState.gamePhase === "setup" || gameState.gamePhase === "aiSetup") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center space-y-6">
+        <div className="text-center space-y-6 max-w-md">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               {gameState.gamePhase === "aiSetup" ? "AI Game Setup" : "Local Game Setup"}
@@ -607,6 +610,32 @@ const GameBoardContent = () => {
               }
             </p>
           </div>
+          
+          {gameState.gamePhase === "aiSetup" && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-lg font-medium mb-3">AI Difficulty:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: 'easy', label: 'Easy', desc: 'Beginner friendly' },
+                    { value: 'medium', label: 'Medium', desc: 'Balanced play' },
+                    { value: 'hard', label: 'Hard', desc: 'Strategic AI' },
+                    { value: 'expert', label: 'Expert', desc: 'Master level' }
+                  ].map(diff => (
+                    <Button
+                      key={diff.value}
+                      onClick={() => setGameState(prev => ({ ...prev, aiDifficulty: diff.value as any }))}
+                      variant={gameState.aiDifficulty === diff.value ? "default" : "outline"}
+                      className="flex flex-col h-auto p-3"
+                    >
+                      <span className="font-semibold">{diff.label}</span>
+                      <span className="text-xs opacity-80">{diff.desc}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="space-y-4">
             <p className="text-lg font-medium">
@@ -626,7 +655,7 @@ const GameBoardContent = () => {
             </div>
             {gameState.gamePhase === "aiSetup" && (
               <p className="text-sm text-muted-foreground text-center">
-                AI players will automatically play their turns
+                AI players will automatically play their turns at {gameState.aiDifficulty} difficulty
               </p>
             )}
           </div>
