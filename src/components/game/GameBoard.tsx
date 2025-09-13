@@ -98,6 +98,9 @@ const GameBoardContent = () => {
     roomCode: null,
     winner: null
   });
+  
+  const [showTurnTransition, setShowTurnTransition] = useState(false);
+  const [pendingPlayer, setPendingPlayer] = useState<number | null>(null);
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -255,12 +258,20 @@ const GameBoardContent = () => {
         }
       }
       
+      const nextPlayer = (gameState.currentPlayer + 1) % gameState.playerCount;
+      
+      // For local games, show turn transition to prevent card peeking
+      if (gameState.gameMode === "local" && winner === null) {
+        setPendingPlayer(nextPlayer);
+        setShowTurnTransition(true);
+      }
+      
       setGameState({
         ...gameState,
         playerHands: newPlayerHands,
         discardPile: newDiscardPile,
         currentSequence: nextSequence,
-        currentPlayer: (gameState.currentPlayer + 1) % gameState.playerCount,
+        currentPlayer: gameState.gameMode === "local" && winner === null ? gameState.currentPlayer : nextPlayer,
         winner,
         gamePhase: winner !== null ? "finished" : "playing"
       });
@@ -273,13 +284,31 @@ const GameBoardContent = () => {
     const newPlayerHands = [...gameState.playerHands];
     const drawnCard = gameState.deck.pop()!;
     newPlayerHands[gameState.currentPlayer].push(drawnCard);
+    const nextPlayer = (gameState.currentPlayer + 1) % gameState.playerCount;
+    
+    // For local games, show turn transition to prevent card peeking
+    if (gameState.gameMode === "local") {
+      setPendingPlayer(nextPlayer);
+      setShowTurnTransition(true);
+    }
     
     setGameState({
       ...gameState,
       deck: gameState.deck.slice(0, -1),
       playerHands: newPlayerHands,
-      currentPlayer: (gameState.currentPlayer + 1) % gameState.playerCount
+      currentPlayer: gameState.gameMode === "local" ? gameState.currentPlayer : nextPlayer
     });
+  };
+  
+  const confirmTurnTransition = () => {
+    if (pendingPlayer !== null) {
+      setGameState(prev => ({
+        ...prev,
+        currentPlayer: pendingPlayer
+      }));
+    }
+    setShowTurnTransition(false);
+    setPendingPlayer(null);
   };
 
   // Effect to handle AI moves
@@ -630,6 +659,21 @@ const GameBoardContent = () => {
               </Button>
             </div>
           </div>
+
+      {/* Turn Transition Screen for Local Games */}
+      {showTurnTransition && gameState.gameMode === "local" && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-card p-8 rounded-xl text-center space-y-6 max-w-md mx-4">
+            <h2 className="text-2xl font-bold">Pass Device</h2>
+            <p className="text-muted-foreground">
+              Hand the device to <span className="font-semibold text-primary">Player {(pendingPlayer || 0) + 1}</span>
+            </p>
+            <Button onClick={confirmTurnTransition} size="lg" className="w-full">
+              Ready - Start My Turn
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Mobile: Current player indicator */}
       <div className="md:hidden text-center mb-4">
