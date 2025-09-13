@@ -1221,7 +1221,11 @@ const GameBoardContent = () => {
                 cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
                 cardSize="md"
                 layout="fan"
-                className="scale-75 transform -rotate-45"
+                className={`scale-75 transition-all duration-300 ${
+                  gameState.playerCount === 5 
+                    ? "transform rotate-[35deg] translate-x-40 translate-y-12" 
+                    : "transform -rotate-45"
+                }`}
               />
             </div>
           </div>
