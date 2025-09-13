@@ -794,23 +794,35 @@ const GameBoardContent = () => {
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
                   <h4 className="font-medium text-accent mb-2">➕ Addy Card</h4>
-                  <p className="text-muted-foreground">Play + number card = new sequence</p>
+                  <p className="text-muted-foreground">Play this + a number card = new sequence value</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
                   <h4 className="font-medium text-accent mb-2">➗ Divide Card</h4>
-                  <p className="text-muted-foreground">Give half your cards to next player</p>
+                  <p className="text-muted-foreground">Give half your remaining cards to the next player</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
                   <h4 className="font-medium text-accent mb-2">🇬🇧 British 3</h4>
-                  <p className="text-muted-foreground">Special wild card effect</p>
+                  <p className="text-muted-foreground">Special wild card with unique British-themed effect</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
                   <h4 className="font-medium text-accent mb-2">🥧 Slice Pi</h4>
-                  <p className="text-muted-foreground">Mathematical wild card</p>
+                  <p className="text-muted-foreground">Mathematical wild card with π-based effects</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🚫 Other Wilds</h4>
-                  <p className="text-muted-foreground">Nuuh, Cannibal, Negativity, Tickles</p>
+                  <h4 className="font-medium text-accent mb-2">🚫 Nuuh Card</h4>
+                  <p className="text-muted-foreground">Blocks or negates certain actions from other players</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">🍖 Cannibal Card</h4>
+                  <p className="text-muted-foreground">Consumes cards from other players or the deck</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">➖ Negativity Card</h4>
+                  <p className="text-muted-foreground">Reverses effects or creates negative impacts</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">😄 Tickles Card</h4>
+                  <p className="text-muted-foreground">Light-hearted wild card with playful effects</p>
                 </div>
               </div>
             </div>
