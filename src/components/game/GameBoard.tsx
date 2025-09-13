@@ -260,6 +260,7 @@ const GameBoardContent = () => {
       let waitingForAddyCard = false;
       let addyBaseSequence = null;
       let shouldAdvancePlayer = true;
+      let newDeck = [...gameState.deck];
       
       if (gameState.waitingForAddyCard && card.type === "number") {
         // Handle addy second card - add to the base sequence
@@ -302,8 +303,47 @@ const GameBoardContent = () => {
         
         nextSequence = gameState.currentSequence + 1;
         if (nextSequence > 9) nextSequence = 1;
+      } else if (card.type === "wild" && card.wildType === "british3") {
+        // British 3 - Set sequence to 3 with British flair
+        nextSequence = 3;
+      } else if (card.type === "wild" && card.wildType === "slicepi") {
+        // Slice Pi - Mathematical effect using π (3.14159...) 
+        // Set sequence to 3 (integer part of π) and next player draws 1 card (for .14...)
+        nextSequence = 3;
+        const nextPlayerIdx = (playerIndex + 1) % gameState.playerCount;
+        if (newDeck.length > 0) {
+          const drawnCard = newDeck.pop()!;
+          newPlayerHands[nextPlayerIdx].push(drawnCard);
+        }
+      } else if (card.type === "wild" && card.wildType === "nuuh") {
+        // Nuuh Card - Blocks/negates - keeps current sequence (blocks normal progression)
+        nextSequence = gameState.currentSequence;
+      } else if (card.type === "wild" && card.wildType === "cannibal") {
+        // Cannibal Card - Consumes cards - takes 1 card from each other player
+        for (let i = 0; i < gameState.playerCount; i++) {
+          if (i !== playerIndex && newPlayerHands[i].length > 0) {
+            const stolenCard = newPlayerHands[i].pop()!;
+            newPlayerHands[playerIndex].push(stolenCard);
+          }
+        }
+        nextSequence = gameState.currentSequence + 1;
+        if (nextSequence > 9) nextSequence = 1;
+      } else if (card.type === "wild" && card.wildType === "negativity") {
+        // Negativity Card - Reverses effects - goes backwards in sequence
+        nextSequence = gameState.currentSequence - 1;
+        if (nextSequence < 1) nextSequence = 9;
+      } else if (card.type === "wild" && card.wildType === "tickles") {
+        // Tickles Card - Playful effect - everyone except current player draws 1 card
+        for (let i = 0; i < gameState.playerCount; i++) {
+          if (i !== playerIndex && newDeck.length > 0) {
+            const drawnCard = newDeck.pop()!;
+            newPlayerHands[i].push(drawnCard);
+          }
+        }
+        nextSequence = gameState.currentSequence + 1;
+        if (nextSequence > 9) nextSequence = 1;
       } else {
-        // Other wild cards - advance sequence by 1 for now (can be expanded)
+        // Default wild card behavior
         nextSequence = gameState.currentSequence + 1;
         if (nextSequence > 9) nextSequence = 1;
       }
@@ -335,6 +375,7 @@ const GameBoardContent = () => {
       
       setGameState({
         ...gameState,
+        deck: newDeck,
         playerHands: newPlayerHands,
         discardPile: newDiscardPile,
         currentSequence: nextSequence,
