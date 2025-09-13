@@ -973,7 +973,7 @@ const GameBoardContent = () => {
         {/* Opponent Players positioned around the table */}
         
         {/* Top Player - Centered above table */}
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
           <div className="rotate-180 opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
@@ -985,8 +985,8 @@ const GameBoardContent = () => {
           </div>
         </div>
         
-        {/* Left Player - Perfectly left of center table */}
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-[350px] -translate-y-1/2 -rotate-90 z-10">
+        {/* Left Player - Perfectly left of center table, moved up */}
+        <div className="absolute left-1/2 top-1/3 transform -translate-x-[350px] -translate-y-1/2 -rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
@@ -998,8 +998,8 @@ const GameBoardContent = () => {
           </div>
         </div>
         
-        {/* Right Player - Perfectly right of center table */}
-        <div className="absolute right-1/2 top-1/2 transform translate-x-[350px] -translate-y-1/2 rotate-90 z-10">
+        {/* Right Player - Perfectly right of center table, moved up */}
+        <div className="absolute right-1/2 top-1/3 transform translate-x-[350px] -translate-y-1/2 rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
