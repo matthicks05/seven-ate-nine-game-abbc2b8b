@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { GameZone } from "./GameZone";
 import { GameCard, Card } from "./GameCard";
-import { GameRulesModal } from "./GameRulesModal";
 
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import ChatPanel from "../chat/ChatPanel";
@@ -82,7 +81,7 @@ interface GameState {
   currentSequence: number;
   currentPlayer: number;
   playerCount: number;
-  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished" | "options";
+  gamePhase: "modeSelect" | "setup" | "aiSetup" | "lobby" | "playing" | "finished" | "options" | "rules";
   gameMode: "local" | "online" | "ai" | null;
   roomCode: string | null;
   winner: number | null;
@@ -110,7 +109,6 @@ const GameBoardContent = () => {
   
   const [showTurnTransition, setShowTurnTransition] = useState(false);
   const [pendingPlayer, setPendingPlayer] = useState<number | null>(null);
-  const [showRules, setShowRules] = useState(false);
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -504,7 +502,13 @@ const GameBoardContent = () => {
                 Options
               </Button>
               <Button 
-                onClick={() => setShowRules(true)}
+                onClick={() => {
+                  console.log('Rules button clicked');
+                  setGameState(prev => ({
+                    ...prev,
+                    gamePhase: "rules"
+                  }));
+                }}
                 variant="outline" 
                 size="sm"
                 className="flex-1"
@@ -729,6 +733,122 @@ const GameBoardContent = () => {
     );
   }
 
+  if (gameState.gamePhase === "rules") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-4xl w-full space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              7-ate-9 Rules
+            </h1>
+            <p className="text-muted-foreground">
+              Learn how to play this exciting card sequence game!
+            </p>
+          </div>
+          
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-card-border space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-primary">Basic Rules</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">🎯 Objective</h4>
+                    <p className="text-muted-foreground">Be the first player to empty your hand of all cards!</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">📋 Setup</h4>
+                    <p className="text-muted-foreground">Each player starts with 7 cards. The sequence starts at the value of the first discard card.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">🔄 Sequence</h4>
+                    <p className="text-muted-foreground">Cards must be played in order: 1→2→3→4→5→6→7→8→9→1→2...</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-primary">Playing Cards</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">✅ Valid Plays</h4>
+                    <p className="text-muted-foreground">Play the exact number needed OR use wild cards for special effects</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">🎴 Can't Play?</h4>
+                    <p className="text-muted-foreground">Draw a card from the deck if you cannot play</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">🏆 Winning</h4>
+                    <p className="text-muted-foreground">First player to play all their cards wins the round!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-primary">Wild Cards</h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">🍽️ Ate Card</h4>
+                  <p className="text-muted-foreground">Advances sequence by 1 (like eating the next number)</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">➕ Addy Card</h4>
+                  <p className="text-muted-foreground">Play + number card = new sequence</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">➗ Divide Card</h4>
+                  <p className="text-muted-foreground">Give half your cards to next player</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">🇬🇧 British 3</h4>
+                  <p className="text-muted-foreground">Special wild card effect</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">🥧 Slice Pi</h4>
+                  <p className="text-muted-foreground">Mathematical wild card</p>
+                </div>
+                <div className="bg-background/50 rounded-lg p-3 border">
+                  <h4 className="font-medium text-accent mb-2">🚫 Other Wilds</h4>
+                  <p className="text-muted-foreground">Nuuh, Cannibal, Negativity, Tickles</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-primary">Strategy Tips</h3>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-foreground">💡 Basic Strategy</h4>
+                  <ul className="space-y-1 text-muted-foreground list-disc list-inside">
+                    <li>Keep track of the sequence number</li>
+                    <li>Save wild cards for strategic moments</li>
+                    <li>Watch other players' card counts</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-foreground">🎯 Advanced Tips</h4>
+                  <ul className="space-y-1 text-muted-foreground list-disc list-inside">
+                    <li>Use Addy cards to change difficult sequences</li>
+                    <li>Time your Divide cards when you have many cards</li>
+                    <li>Block opponents from winning with strategic wilds</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <Button
+            onClick={() => setGameState(prev => ({ ...prev, gamePhase: "modeSelect" }))}
+            className="w-full"
+          >
+            Back to Main Menu
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (gameState.gamePhase === "setup" || gameState.gamePhase === "aiSetup") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -837,7 +957,12 @@ const GameBoardContent = () => {
               {/* Mobile: Compact action buttons */}
               <div className="md:hidden flex gap-1">
                 <Button 
-                  onClick={() => setShowRules(true)}
+                  onClick={() => {
+                    setGameState(prev => ({
+                      ...prev,
+                      gamePhase: "rules"
+                    }));
+                  }}
                   variant="outline" 
                   size="sm" 
                   className="gap-2"
@@ -1194,8 +1319,6 @@ const GameBoardContent = () => {
         )}
       </div>
       
-      {/* Modals */}
-      <GameRulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
      </div>
    );
  };
