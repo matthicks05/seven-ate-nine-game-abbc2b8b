@@ -985,8 +985,8 @@ const GameBoardContent = () => {
           </div>
         </div>
         
-        {/* Left Player - Perfectly left of center table, moved up */}
-        <div className="absolute left-1/2 top-1/3 transform -translate-x-[350px] -translate-y-1/2 -rotate-90 z-10">
+        {/* Left Player - Perfectly left of center table, moved up and further left */}
+        <div className="absolute left-1/2 top-1/3 transform -translate-x-[450px] -translate-y-1/2 -rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
