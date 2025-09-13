@@ -866,7 +866,7 @@ const GameBoardContent = () => {
                   <p className="text-muted-foreground">All players draw one card</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
-                  <h4 className="font-medium text-accent mb-2">🥧 Slice Pi</h4>
+                  <h4 className="font-medium text-accent mb-2">🥧 Slice of Pi</h4>
                   <p className="text-muted-foreground">Discard all 1s, 2s, 3s, and 4s from hand</p>
                 </div>
                 <div className="bg-background/50 rounded-lg p-3 border">
