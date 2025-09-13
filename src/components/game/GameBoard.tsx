@@ -1180,7 +1180,7 @@ const GameBoardContent = () => {
               layout="fan"
               className={`scale-75 transition-all duration-300 ${
                 gameState.playerCount === 5 
-                  ? "transform -rotate-[35deg] -translate-x-40 translate-y-6" 
+                  ? "transform -rotate-[35deg] -translate-x-40 translate-y-12" 
                   : ""
               }`}
             />
