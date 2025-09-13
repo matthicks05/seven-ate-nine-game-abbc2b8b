@@ -756,16 +756,40 @@ const GameBoardContent = () => {
         </div>
       </div>
 
-          {/* Player Hand - Mobile Optimized */}
-          <div className="mt-4 md:mt-8">
+          {/* Player Hands - Show only current player's cards */}
+          <div className="mt-4 md:mt-8 space-y-4">
+            {/* Current Player's Hand */}
             <GameZone
               title={`Your Hand (Player ${gameState.currentPlayer + 1})`}
               cards={gameState.playerHands[gameState.currentPlayer] || []}
               layout="fan"
               onCardClick={(card) => handleCardPlay(card, gameState.currentPlayer)}
-              className="bg-card/30 backdrop-blur-sm border border-card-border"
+              className="bg-card/30 backdrop-blur-sm border border-primary/20"
               cardSize="md"
             />
+            
+            {/* Other Players' Hands - Show only card count and back of cards */}
+            {gameState.playerHands.map((hand, index) => {
+              if (index === gameState.currentPlayer) return null;
+              
+              // Create hidden cards for display
+              const hiddenCards = hand.map((card, cardIndex) => ({
+                ...card,
+                id: `hidden-${index}-${cardIndex}`,
+                isVisible: false
+              }));
+              
+              return (
+                <GameZone
+                  key={index}
+                  title={`${gameState.gameMode === "ai" && index > 0 ? `AI Player ${index}` : `Player ${index + 1}`} (${hand.length} cards)`}
+                  cards={hiddenCards}
+                  layout="fan"
+                  className="bg-muted/20 opacity-60"
+                  cardSize="sm"
+                />
+              );
+            })}
           </div>
         </div>
 
