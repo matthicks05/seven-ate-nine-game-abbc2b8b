@@ -974,39 +974,39 @@ const GameBoardContent = () => {
         
         {/* Top Player */}
         <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="rotate-180 opacity-60 hover:opacity-80 transition-opacity">
+          <div className="rotate-180 opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
               cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `p2-${index}`, isVisible: false })) || []}
-              cardSize="sm"
+              cardSize="lg"
               layout="fan"
-              className="scale-75"
+              className="scale-90"
             />
           </div>
         </div>
         
         {/* Left Player */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 -rotate-90 z-10">
-          <div className="opacity-60 hover:opacity-80 transition-opacity">
+          <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
               cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
-              cardSize="sm"
+              cardSize="lg"
               layout="fan"
-              className="scale-75"
+              className="scale-90"
             />
           </div>
         </div>
         
         {/* Right Player */}
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2 rotate-90 z-10">
-          <div className="opacity-60 hover:opacity-80 transition-opacity">
+          <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
               cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
-              cardSize="sm"
+              cardSize="lg"
               layout="fan"
-              className="scale-75"
+              className="scale-90"
             />
           </div>
         </div>
@@ -1092,29 +1092,29 @@ const GameBoardContent = () => {
       {/* Mobile Layout - UNO Style */}
       <div className="md:hidden flex flex-col min-h-screen relative overflow-hidden">
         {/* Top Opponent */}
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 rotate-180 opacity-50 scale-75 z-10">
+        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 rotate-180 opacity-75 scale-90 z-10">
           <GameZone
             title={gameState.gameMode === "ai" ? "AI Player" : "Opponent"}
-            cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `mobile-p2-${index}`, isVisible: false })).slice(0, 3) || []}
-            cardSize="sm"
+            cards={gameState.playerHands[1]?.map((card, index) => ({ ...card, id: `mobile-p2-${index}`, isVisible: false })).slice(0, 5) || []}
+            cardSize="lg"
             layout="fan"
           />
         </div>
         
         {/* Side Opponents */}
-        <div className="absolute left-2 top-1/3 -rotate-90 opacity-40 scale-50 z-10">
+        <div className="absolute left-2 top-1/3 -rotate-90 opacity-60 scale-75 z-10">
           <GameZone
             title="Player"
-            cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `mobile-p3-${index}`, isVisible: false })).slice(0, 2) || []}
-            cardSize="sm"
+            cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `mobile-p3-${index}`, isVisible: false })).slice(0, 3) || []}
+            cardSize="lg"
             layout="fan"
           />
         </div>
-        <div className="absolute right-2 top-1/3 rotate-90 opacity-40 scale-50 z-10">
+        <div className="absolute right-2 top-1/3 rotate-90 opacity-60 scale-75 z-10">
           <GameZone
             title="Player"
-            cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `mobile-p4-${index}`, isVisible: false })).slice(0, 2) || []}
-            cardSize="sm"
+            cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `mobile-p4-${index}`, isVisible: false })).slice(0, 3) || []}
+            cardSize="lg"
             layout="fan"
           />
         </div>
