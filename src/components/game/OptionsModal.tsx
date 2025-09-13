@@ -13,7 +13,7 @@ export const OptionsModal: React.FC<OptionsModalProps> = ({ isOpen, onClose }) =
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[100] bg-background border border-border">
+      <DialogContent className="max-w-md z-[9999] bg-background border border-border fixed inset-0 m-auto h-fit">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
