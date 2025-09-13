@@ -278,6 +278,27 @@ const GameBoardContent = () => {
         // Ate card - keeps current sequence
         nextSequence = gameState.currentSequence + 1;
         if (nextSequence > 9) nextSequence = 1;
+      } else if (card.type === "wild" && card.wildType === "divide") {
+        // Divide card - give half cards to next player
+        const currentPlayerHand = newPlayerHands[playerIndex];
+        const nextPlayerIndex = (playerIndex + 1) % gameState.playerCount;
+        
+        // If only 1 card left (the divide card we just played), player wins
+        if (currentPlayerHand.length === 0) {
+          // Player wins by playing their last card
+        } else {
+          // Calculate how many cards to give (half, rounded down if odd)
+          const cardsToGive = Math.floor(currentPlayerHand.length / 2);
+          
+          if (cardsToGive > 0) {
+            // Remove cards from current player and give to next player
+            const cardsToMove = currentPlayerHand.splice(0, cardsToGive);
+            newPlayerHands[nextPlayerIndex].push(...cardsToMove);
+          }
+        }
+        
+        nextSequence = gameState.currentSequence + 1;
+        if (nextSequence > 9) nextSequence = 1;
       } else {
         // Other wild cards - advance sequence by 1 for now (can be expanded)
         nextSequence = gameState.currentSequence + 1;
