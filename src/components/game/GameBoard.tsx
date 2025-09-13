@@ -1051,7 +1051,7 @@ const GameBoardContent = () => {
               <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
                 <div className="bg-accent/20 rounded-full px-6 py-3 border-2 border-accent/40 backdrop-blur-sm">
                   <span className="text-2xl font-bold text-accent-foreground">
-                    Next: {gameState.currentSequence}
+                    next needed card: {gameState.currentSequence}
                   </span>
                 </div>
               </div>
