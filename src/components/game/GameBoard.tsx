@@ -12,8 +12,10 @@ import { useGameRoom } from "@/hooks/useGameRoom";
 import { useAIPlayers } from "@/hooks/useAIPlayers";
 import { useGameScoring } from "@/hooks/useGameScoring";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useTheme, type Theme } from "@/contexts/ThemeContext";
 import { Leaderboard } from "@/components/leaderboard/Leaderboard";
-import { MessageCircle, Trophy, LogIn, Settings, HelpCircle, Palette } from "lucide-react";
+import { MessageCircle, Trophy, LogIn, Settings, HelpCircle, Palette, Check } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 
@@ -116,6 +118,7 @@ const GameBoardContent = () => {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const { currentRoom, players, isLoading, createRoom, joinRoom, leaveRoom, sessionId } = useGameRoom();
   const { makeAIMove, initializeAI, aiThinking } = useAIPlayers();
+  const { currentTheme, setTheme, themes } = useTheme();
   const { awardPointsForWin, recordGamePlayed } = useGameScoring();
   
   // Safely get auth context
@@ -647,9 +650,17 @@ const GameBoardContent = () => {
   }
 
   if (gameState.gamePhase === "options") {
+    const themePreviewColors: Record<Theme, { primary: string; secondary: string; accent: string }> = {
+      vibrant: { primary: '#C084FC', secondary: '#22D3EE', accent: '#FDE047' },
+      forest: { primary: '#34D399', secondary: '#A78BFA', accent: '#FBBF24' },
+      ocean: { primary: '#38BDF8', secondary: '#10B981', accent: '#F59E0B' },
+      sunset: { primary: '#FB7185', secondary: '#FB923C', accent: '#FBBF24' },
+      cosmic: { primary: '#A855F7', secondary: '#C084FC', accent: '#22D3EE' }
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center space-y-8 max-w-md">
+        <div className="text-center space-y-8 max-w-md w-full">
           <div className="space-y-4">
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               Game Options
@@ -661,13 +672,49 @@ const GameBoardContent = () => {
           
           <div className="space-y-6">
             <div className="bg-card/30 backdrop-blur-sm border border-primary/20 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 justify-center">
                 <Palette className="h-5 w-5" />
                 Color Theme
               </h3>
-              <p className="text-sm text-muted-foreground">
-                Theme selection coming soon! Currently using the default theme.
-              </p>
+              <div className="grid gap-3">
+                {(Object.keys(themes) as Theme[]).map((themeKey) => {
+                  const colors = themePreviewColors[themeKey];
+                  const isSelected = currentTheme === themeKey;
+                  
+                  return (
+                    <Button
+                      key={themeKey}
+                      variant={isSelected ? "default" : "outline"}
+                      className="w-full justify-between h-auto p-4"
+                      onClick={() => setTheme(themeKey)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex gap-1">
+                          <div 
+                            className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                            style={{ backgroundColor: colors.primary }}
+                          />
+                          <div 
+                            className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                            style={{ backgroundColor: colors.secondary }}
+                          />
+                          <div 
+                            className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                            style={{ backgroundColor: colors.accent }}
+                          />
+                        </div>
+                        <span className="font-medium">{themes[themeKey]}</span>
+                      </div>
+                      {isSelected && (
+                        <Badge variant="secondary" className="ml-2">
+                          <Check className="h-3 w-3 mr-1" />
+                          Active
+                        </Badge>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
           </div>
           
