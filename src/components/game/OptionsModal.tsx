@@ -11,6 +11,7 @@ interface OptionsModalProps {
 }
 
 export const OptionsModal: React.FC<OptionsModalProps> = ({ isOpen, onClose }) => {
+  console.log('OptionsModal render - isOpen:', isOpen);
   const { currentTheme, setTheme, themes } = useTheme();
 
   const themePreviewColors: Record<Theme, { primary: string; secondary: string; accent: string }> = {
@@ -23,7 +24,7 @@ export const OptionsModal: React.FC<OptionsModalProps> = ({ isOpen, onClose }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md z-[100] bg-background border border-border">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />

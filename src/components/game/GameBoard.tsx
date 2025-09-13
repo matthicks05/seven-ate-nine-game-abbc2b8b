@@ -110,6 +110,7 @@ const GameBoardContent = () => {
   const [pendingPlayer, setPendingPlayer] = useState<number | null>(null);
   const [showRules, setShowRules] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  console.log('GameBoard showOptions state:', showOptions);
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -487,7 +488,10 @@ const GameBoardContent = () => {
             {/* Options and Help buttons */}
             <div className="flex gap-2 justify-center">
               <Button 
-                onClick={() => setShowOptions(true)}
+                onClick={() => {
+                  console.log('Options button clicked');
+                  setShowOptions(true);
+                }}
                 variant="outline" 
                 size="sm"
                 className="flex-1"
