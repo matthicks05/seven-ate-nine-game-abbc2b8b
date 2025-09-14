@@ -1178,17 +1178,17 @@ const GameBoardContent = () => {
               cards={gameState.playerHands[2]?.map((card, index) => ({ ...card, id: `p3-${index}`, isVisible: false })) || []}
               cardSize="md"
               layout="fan"
-              className={`scale-75 transition-all duration-300 ${
-                gameState.playerCount === 5 
-                  ? "transform -rotate-[35deg] -translate-x-40 translate-y-12" 
-                  : ""
-              }`}
+              className="scale-75"
             />
           </div>
         </div>
         
         {/* Left Player - Positioned outward from center table */}
-        <div className="absolute left-1/2 top-1/3 transform -translate-x-[405px] -translate-y-1/2 -rotate-90 z-10">
+        <div className={`absolute z-10 ${
+          gameState.playerCount === 5 
+            ? 'left-1/2 top-1/4 transform -translate-x-[320px] -translate-y-1/2 -rotate-[60deg]'
+            : 'left-1/2 top-1/3 transform -translate-x-[405px] -translate-y-1/2 -rotate-90'
+        }`}>
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
@@ -1201,7 +1201,11 @@ const GameBoardContent = () => {
         </div>
         
         {/* Right Player - Positioned outward from center table */}
-        <div className="absolute right-1/2 top-1/3 transform translate-x-[405px] -translate-y-1/2 rotate-90 z-10">
+        <div className={`absolute z-10 ${
+          gameState.playerCount === 5 
+            ? 'right-1/2 top-1/4 transform translate-x-[320px] -translate-y-1/2 rotate-[60deg]'
+            : 'right-1/2 top-1/3 transform translate-x-[405px] -translate-y-1/2 rotate-90'
+        }`}>
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? 
@@ -1216,22 +1220,19 @@ const GameBoardContent = () => {
               layout="fan"
               className="scale-75"
             />
+          </div>
         </div>
 
-        {/* Fifth Player - Top Right for 5-player mode */}
+        {/* Fourth Player - Top-left for 5-player mode */}
         {gameState.playerCount === 5 && (
-          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 z-10">
             <div className="opacity-80 hover:opacity-100 transition-opacity">
               <GameZone
                 title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
                 cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
                 cardSize="md"
                 layout="fan"
-                className={`scale-75 transition-all duration-300 ${
-                  gameState.playerCount === 5 
-                    ? "transform -rotate-[50deg] -translate-x-36 translate-y-12" 
-                    : "transform -rotate-45"
-                }`}
+                className="scale-75 transform -rotate-[30deg]"
               />
             </div>
           </div>
@@ -1436,8 +1437,7 @@ const GameBoardContent = () => {
         )}
       </div>
       
-     </div>
-   );
+    );
  };
 
 export const GameBoard = () => {
