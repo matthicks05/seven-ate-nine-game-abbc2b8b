@@ -1237,13 +1237,13 @@ const GameBoardContent = () => {
           </div>
         )}
         
-        {/* Fourth Player - Top position for 3 and 4 player modes */}
-        {gameState.playerCount <= 4 && (
+        {/* Fourth Player - Top position for 3 player mode only */}
+        {gameState.playerCount === 3 && (
           <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
             <div className="opacity-80 hover:opacity-100 transition-opacity">
               <GameZone
-                title={gameState.gameMode === "ai" ? `AI Player 5 (${gameState.playerHands[4]?.length || 0})` : `Player 5 (${gameState.playerHands[4]?.length || 0})`}
-                cards={gameState.playerHands[4]?.map((card, index) => ({ ...card, id: `p5-${index}`, isVisible: false })) || []}
+                title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
+                cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
                 cardSize="md"
                 layout="fan"
                 className="scale-75 transform -rotate-45"
