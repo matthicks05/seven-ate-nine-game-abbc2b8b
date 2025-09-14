@@ -1171,7 +1171,7 @@ const GameBoardContent = () => {
         {/* Opponent Players positioned around the table */}
         
         {/* Top Player - Centered above table */}
-        <div className={`absolute top-8 z-10 ${gameState.playerCount === 5 ? 'left-1/2 transform -translate-x-1/2' : 'left-1/2 transform -translate-x-1/2'}`}>
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 3 (${gameState.playerHands[2]?.length || 0})` : `Player 3 (${gameState.playerHands[2]?.length || 0})`}
@@ -1184,11 +1184,7 @@ const GameBoardContent = () => {
         </div>
         
         {/* Left Player - Positioned outward from center table */}
-        <div className={`absolute z-10 ${
-          gameState.playerCount === 5 
-            ? 'left-1/2 top-1/4 transform -translate-x-[320px] -translate-y-1/2 -rotate-[60deg]'
-            : 'left-1/2 top-1/3 transform -translate-x-[405px] -translate-y-1/2 -rotate-90'
-        }`}>
+        <div className="absolute left-1/2 top-1/3 transform -translate-x-[405px] -translate-y-1/2 -rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? `AI Player 2 (${gameState.playerHands[1]?.length || 0})` : `Player 2 (${gameState.playerHands[1]?.length || 0})`}
@@ -1201,11 +1197,7 @@ const GameBoardContent = () => {
         </div>
         
         {/* Right Player - Positioned outward from center table */}
-        <div className={`absolute z-10 ${
-          gameState.playerCount === 5 
-            ? 'right-1/2 top-1/4 transform translate-x-[320px] -translate-y-1/2 rotate-[60deg]'
-            : 'right-1/2 top-1/3 transform translate-x-[405px] -translate-y-1/2 rotate-90'
-        }`}>
+        <div className="absolute right-1/2 top-1/3 transform translate-x-[405px] -translate-y-1/2 rotate-90 z-10">
           <div className="opacity-80 hover:opacity-100 transition-opacity">
             <GameZone
               title={gameState.gameMode === "ai" ? 
@@ -1223,16 +1215,16 @@ const GameBoardContent = () => {
           </div>
         </div>
 
-        {/* Fourth Player - Top-left for 5-player mode */}
+        {/* Fourth Player - Top Right for 5-player mode */}
         {gameState.playerCount === 5 && (
-          <div className="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 z-10">
+          <div className="absolute top-8 right-1/4 transform -translate-y-1/2 z-10">
             <div className="opacity-80 hover:opacity-100 transition-opacity">
               <GameZone
                 title={gameState.gameMode === "ai" ? `AI Player 4 (${gameState.playerHands[3]?.length || 0})` : `Player 4 (${gameState.playerHands[3]?.length || 0})`}
                 cards={gameState.playerHands[3]?.map((card, index) => ({ ...card, id: `p4-${index}`, isVisible: false })) || []}
                 cardSize="md"
                 layout="fan"
-                className="scale-75 transform -rotate-[30deg]"
+                className="scale-75 transform -rotate-45"
               />
             </div>
           </div>
